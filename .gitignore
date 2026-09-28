@@ -1,2 +1,4 @@
 *.zip
 .omp/
+/skills/moroccan-darija
+claude-web-skills/moroccan-darija.skill
