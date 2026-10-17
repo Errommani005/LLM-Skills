@@ -18,6 +18,8 @@ Each skill is self-contained in its own independent folder and includes its own 
 │   ├── external-delegation/
 │   ├── ghosty-spec/
 │   ├── project-uphaul/
+│   ├── scenario-coverage-testing/
+│   ├── subject-full-guide/
 │   └── yt-deep-extraction/
 ├── claude-web-skills/
 │   └── *.skill (packaged web skills)
@@ -97,6 +99,16 @@ A domain-agnostic testing methodology that simulates realistic end-to-end user j
 - **Coverage Matrix & Personas:** Builds an exhaustive surface inventory (GUI screens, CLI commands, API endpoints, agent handoffs, background jobs), designs 5-6 diverse personas covering every cell of that matrix with different entry points, tool combinations, data scales, and failure injection points, ensuring "full coverage" is a deliverable not a hope.
 - **Deliverables:** Coverage matrix filled in, bug log for every incident found (with reproduction steps if unfixable), and a plain-language verdict summary of what's solid, risky, or needs human decision.
 *Use this when you want to stress test or "break" an app built with Claude Code/Codex/omp.sh/Antigravity CLI, prep something for shipping, or run full QA on any agentic-AI project.*
+
+### 10. `subject-full-guide`
+**Comprehensive Course & Document Study Guide Generator**
+Produces a complete, structured, printable course revision guide from attached course documents or a specified subject, delivered as a self-contained LaTeX document ready for PDF compilation or Markdown.
+- **Exhaustive Coverage:** Captures every chapter's definitions, theorems, formulas, algorithms, worked examples, and comparative tables without silently cutting or shrinking material.
+- **Strict Grounding:** Faithfully transcribes facts, formulas, and terminology exactly as presented in the source documents, preventing hallucinations and approximations.
+- **Exercise-Solving Strategies:** Analyzes TD/TP practical materials and generates generalized problem-solving strategies grouped by topic, rather than isolated solved problems.
+- **Multi-Part Splitting:** Automatically partitions extensive course materials into clean, numbered multi-part guides when content exceeds single-output constraints.
+- **Publication Ready:** Formats output with complete document structure, tables of contents, standardized mathematical notation, and artifact-completion signaling.
+*Use this when you need a complete, exhaustive, printable course guide or revision handout from lecture notes, slides, or textbooks instead of a surface-level summary.*
 ## How to Use
 
 This repository offers skills in two different formats depending on where you intend to use them:
