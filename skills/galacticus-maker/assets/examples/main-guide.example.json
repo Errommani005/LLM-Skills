@@ -1,0 +1,144 @@
+{
+ "sections": [
+  {
+   "id": "howto",
+   "kind": "howto",
+   "title": "How to use this guide",
+   "intro": "This page is assembled only from the facts stored in the nodes, so every claim below can be traced back to a lecture or lab slide.",
+   "items": [
+    {
+     "text": "Read it top to bottom once: the map shows the whole course, the reference sheet gives the must-know definitions, the niche sheet gives small numbers and names, the traps sheet shows where marks are lost, then the checklist and the core-first route close the loop."
+    },
+    {
+     "text": "Cram mode follows the core-first route: 44 core nodes in teaching order, about 320 min (5 h 20) in total, then the traps and the night-before checklist. Choose it when time is short and you need the headline concepts first."
+    },
+    {
+     "text": "Mastery mode follows the main pathway stage by stage through all 122 nodes (core, standard and detail), about 786 min (13 h 06). Choose it when you have days, want every small fact, and want to see how each idea leads to the next."
+    }
+   ]
+  },
+  {
+   "id": "map",
+   "kind": "map",
+   "title": "The course map",
+   "intro": "The main pathway is the professor's own teaching order: 10 stages, 122 nodes. Each stage groups nodes taught together.",
+   "items": [
+    {
+     "text": "Stage 1, Course frame, the relational baseline and why NoSQL - 18 nodes, 9 core, about 98 min. Lecture 1 opens with prerequisites and the framing scenarios, recalls Codd, anomalies and the RDBMS, then moves to JSON formats, the NoSQL definition, motivations and trade-offs."
+    },
+    {
+     "text": "Stage 2, TP1: designing and querying a relational schema - 9 nodes, 2 core, about 62 min. TP1 follows Lecture 1 with the University of Atlas case, from schema design and DDL to inserts, joins and aggregation."
+    }
+   ]
+  },
+  {
+   "id": "reference",
+   "kind": "reference",
+   "title": "Must-know definitions and rules",
+   "intro": "One line each. If you can say these aloud without looking, you cover the headline questions of a lesson-based final.",
+   "items": [
+    {
+     "ref": "L1#11",
+     "text": "An RDBMS has four core components: storage management, memory management, the data dictionary and a query language (SQL).",
+     "quote": "Inside an RDBMS: Four Core Components"
+    },
+    {
+     "ref": "L1#23",
+     "text": "NoSQL stores and retrieves data without the tabular relations of relational databases, and is used in real-time web applications and big data.",
+     "quote": "Used in real-time web applications and big data."
+    },
+    {
+     "ref": "L1#25",
+     "text": "The core trade-off: relational gives more functionality (schema first, mature consistency); NoSQL gives less functionality but is easy to scale and much faster for most operations.",
+     "quote": "A key advantage of NoSQL is that it is easy to scale and much faster for most operations."
+    }
+   ]
+  },
+  {
+   "id": "niche",
+   "kind": "niche",
+   "title": "Niche facts sheet",
+   "intro": "Small numbers, names, dates and thresholds, in lecture order. These are the details that sit inside the slides rather than on their headlines.",
+   "items": [
+    {
+     "ref": "L1#1",
+     "text": "The NoSQL module is taught by instructor Anas Knari (contact email [email redacted]).",
+     "quote": "Module Instructor : Anas Knari ([email redacted])"
+    },
+    {
+     "ref": "L1#1",
+     "text": "The module is given in the academic year 2026-2027.",
+     "quote": "Academic Year : 2026-2027"
+    },
+    {
+     "ref": "L1#3",
+     "text": "Reference book by Meier and Kaufmann (2019), SQL & NoSQL Databases: Models, Languages, Consistency Options and Architectures for Big Data Management, published by Springer Vieweg.",
+     "quote": "Meier, A., & Kaufmann, M. (2019)"
+    },
+    {
+     "ref": "L1#3",
+     "text": "Reference book by Sadalage and Fowler (2013), NoSQL Distilled: A Brief Guide to the Emerging World of Polyglot Persistence, from Addison-Wesley Professional.",
+     "quote": "Sadalage, P. J., & Fowler, M. (2013)"
+    }
+   ]
+  },
+  {
+   "id": "traps",
+   "kind": "traps",
+   "title": "Traps and look-alikes",
+   "intro": "Places where two ideas look alike or an obvious answer is incomplete. Each one points back to the slide that settles it.",
+   "items": [
+    {
+     "ref": "L1#23",
+     "text": "Trap: NoSQL does not simply mean \"no SQL\"; it is sometimes called \"Not only SQL\" to stress that these systems may support SQL-like query languages.",
+     "quote": "Sometimes called “Not only SQL” to emphasize that they may support SQL-like query languages."
+    },
+    {
+     "ref": "L3#4",
+     "text": "Trap: the word consistency has two meanings in the lectures, transaction consistency and replica consistency; the slide warns not to confuse them.",
+     "quote": "Two meanings, don't confuse them"
+    },
+    {
+     "ref": "L3#6",
+     "text": "Trap: CAP is not \"pick any two\" in practice; partitions are rare on local networks, so designers mostly trade consistency against availability.",
+     "quote": "In practice, partitions are rare on local networks"
+    }
+   ]
+  },
+  {
+   "id": "checklist",
+   "kind": "checklist",
+   "title": "Night-before checklist",
+   "intro": "No new material tonight. Re-read, say aloud, then sleep.",
+   "items": [
+    {
+     "text": "Re-read the reference sheet once, slowly, then cover it and say each definition aloud in one sentence."
+    },
+    {
+     "text": "Re-read the niche facts sheet in lecture order and write the numbers and names from memory on a blank page: dates, thresholds, port-like figures, product limits."
+    },
+    {
+     "text": "Say aloud: the CAP trio and the two meanings of consistency; the four ACID and three BASE properties; read and write thresholds with 5 replicas."
+    }
+   ]
+  },
+  {
+   "id": "route",
+   "kind": "route",
+   "title": "Core-first route",
+   "intro": "The 44 core nodes in main-pathway order, about 320 min (5 h 20) in total. Do these first; anything else is a bonus.",
+   "items": [
+    {
+     "text": "Different requirements, different databases - sets the idea behind the whole course: requirements decide the structure, bank transfer versus shopping cart (about 5 min)"
+    },
+    {
+     "text": "JSON: format, properties and syntax rules - JSON is the document format used for the rest of the course and a likely recall question (about 7 min)"
+    },
+    {
+     "text": "What NoSQL is - the base definition every other answer builds on, including the named examples (about 5 min)"
+    },
+    {"text": "When to choose NoSQL - the checklist for choosing NoSQL, the typical scenario question (about 5 min)"}
+   ]
+  }
+ ]
+}

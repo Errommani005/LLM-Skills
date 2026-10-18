@@ -1,0 +1,482 @@
+{
+ "nodeId": "eventual-consistency-and-base",
+ "guide": {
+  "index": [
+   "What you need first",
+   "Two transaction models: ACID and BASE",
+   "BASE in detail",
+   "Example: the address update",
+   "Five strengths of eventual consistency",
+   "Why write order matters: Charlie",
+   "Traps",
+   "Recap"
+  ],
+  "sections": [
+   {
+    "id": "prereq",
+    "title": "What you need first",
+    "kind": "prereq",
+    "body": "- Step 4: AP systems stay available and may return stale data; designers mostly trade consistency against availability.\n- Step 5: in the L4#39 quorum example there is no two-phase commit, so replicas may briefly disagree but converge eventually.\n\nThis step names that behaviour (BASE, eventual consistency) and says exactly what a reader may see while copies converge.",
+    "refs": [
+     "L3#6",
+     "L4#39"
+    ]
+   },
+   {
+    "id": "acid-base",
+    "title": "Two transaction models: ACID and BASE",
+    "kind": "definition",
+    "body": "**ACID** is the relational model: strong, strict guarantees on every transaction, correctness first. Atomicity, Consistency, Isolation, Durability.\n\n**BASE** is common to NoSQL: looser guarantees that favor availability and speed at scale. Basically Available, Soft State, Eventually Consistent (L3#10).",
+    "facts": [
+     {
+      "text": "ACID: strong, strict guarantees on every transaction, correctness first.",
+      "ref": "L3#10",
+      "quote": "Strong, strict guarantees on every transaction, correctness first."
+     },
+     {
+      "text": "BASE: looser guarantees that favor availability and speed at scale.",
+      "ref": "L3#10",
+      "quote": "Looser guarantees that favor availability and speed at scale."
+     },
+     {
+      "text": "ACID stands for Atomicity, Consistency, Isolation, Durability.",
+      "ref": "L3#10",
+      "quote": "Atomicity · Consistency · Isolation · Durability"
+     },
+     {
+      "text": "BASE stands for Basically Available, Soft State, Eventually Consistent.",
+      "ref": "L3#10",
+      "quote": "Basically Available · Soft State · Eventually Consistent"
+     }
+    ],
+    "refs": [
+     "L3#10"
+    ]
+   },
+   {
+    "id": "base-detail",
+    "title": "BASE in detail",
+    "kind": "definition",
+    "body": "From L3#11:\n\n- **Basically Available**: a partial failure is tolerated, the rest of the system keeps serving. Replicas mean queries still succeed if a server fails.\n- **Soft State**: the state is not fixed; a value may be overwritten by more recent data later on.\n- **Eventually Consistent**: copies may differ briefly, then converge to the same value once replication catches up.",
+    "facts": [
+     {
+      "text": "Basically available: a partial failure is tolerated, the rest of the system keeps serving.",
+      "ref": "L3#11",
+      "quote": "A partial failure is tolerated, the rest of the system keeps serving."
+     },
+     {
+      "text": "Replicas mean queries still succeed if a server fails.",
+      "ref": "L3#11",
+      "quote": "Replicas mean queries still succeed if a server fails."
+     },
+     {
+      "text": "Soft state: a value may be overwritten by more recent data later on.",
+      "ref": "L3#11",
+      "quote": "a value may be overwritten by more recent data later on"
+     },
+     {
+      "text": "Eventually consistent: copies may differ briefly, then converge once replication catches up.",
+      "ref": "L3#11",
+      "quote": "Copies may differ briefly, then converge to the same value once replication catches up."
+     }
+    ],
+    "refs": [
+     "L3#11"
+    ]
+   },
+   {
+    "id": "address",
+    "title": "Example: the address update",
+    "kind": "example",
+    "body": "A user updates her address on one server. A nearby replica updates instantly, but a data center thousands of miles away lags: briefly, the copies disagree (L3#11). Once replication catches up, they hold the same value again.",
+    "facts": [
+     {
+      "text": "Example: a nearby replica updates instantly, but a data center thousands of miles away lags, so the copies briefly disagree.",
+      "ref": "L3#11",
+      "quote": "a nearby replica updates instantly, but a data center thousands of miles away lags"
+     }
+    ],
+    "refs": [
+     "L3#11"
+    ]
+   },
+   {
+    "id": "strengths",
+    "title": "Five strengths of eventual consistency",
+    "kind": "summary",
+    "body": "\"Eventually consistent\" comes in several strengths, each a different guarantee about what a reader may see (L3#12, L3#13):\n\n- **Causal**: all copies reflect the order in which updates happened. A change to $1,000 lands everywhere before a later change to $2,000.\n- **Read-your-writes**: once you write a value, your own reads always return it.\n- **Session**: read-your-writes holds, but only within one session.\n- **Monotonic read**: once you have seen a value, you will never see an earlier version of it.\n- **Monotonic write**: your writes execute in the order you issued them, essential when operations don't commute.",
+    "facts": [
+     {
+      "text": "Eventually consistent comes in several strengths, each a different guarantee about what a reader may see.",
+      "ref": "L3#12",
+      "quote": "each a different guarantee about what a reader may see"
+     },
+     {
+      "text": "Causal: a change to $1,000 lands everywhere before a later change to $2,000.",
+      "ref": "L3#12",
+      "quote": "a change to $1,000 lands everywhere before a later change to $2,000"
+     },
+     {
+      "text": "Read-your-writes: you never see a value older than the one you just wrote.",
+      "ref": "L3#12",
+      "quote": "you never see a value older than the one you just wrote"
+     },
+     {
+      "text": "Session: read-your-writes holds, but only within one session.",
+      "ref": "L3#12",
+      "quote": "Read-your-writes holds, but only within one session."
+     },
+     {
+      "text": "Monotonic read: reads only move forward in time.",
+      "ref": "L3#13",
+      "quote": "reads only move forward in time"
+     },
+     {
+      "text": "Monotonic write: your writes execute in the order you issued them.",
+      "ref": "L3#13",
+      "quote": "Your writes execute in the order you issued them, essential when operations don't commute."
+     }
+    ],
+    "refs": [
+     "L3#12",
+     "L3#13"
+    ]
+   },
+   {
+    "id": "charlie",
+    "title": "Why write order matters: Charlie",
+    "kind": "example",
+    "body": "Charlie owes **$1,000** (L3#13).\n\n- Apply a 10% discount, then add a $1,100 order: $900 + $1,100 = **$2,000**.\n- Reverse the order: $2,100 less 10% = **$1,890**.\n\nSame operations, different result. That is why monotonic write consistency matters when operations don't commute.",
+    "facts": [
+     {
+      "text": "Discount first, then the order: $900 + $1,100 = $2,000.",
+      "ref": "L3#13",
+      "quote": "$900 + $1,100 = $2,000"
+     },
+     {
+      "text": "Order first, then the discount: $2,100 less 10% = $1,890.",
+      "ref": "L3#13",
+      "quote": "$2,100 less 10% = $1,890"
+     }
+    ],
+    "refs": [
+     "L3#13"
+    ]
+   },
+   {
+    "id": "traps",
+    "title": "Traps",
+    "kind": "trap",
+    "body": "- Trap: eventual consistency is not \"no consistency\". Copies converge to the same value once replication catches up (L3#11).\n- Trap: session consistency is read-your-writes **limited to one session**; end the session and the guarantee may not carry over (L3#12).\n- Trap: monotonic **read** is about what you see (never an earlier version); monotonic **write** is about the order your writes execute (L3#13).\n- Trap: the C of ACID is transaction consistency, not CAP's replica consistency (our mapping of the two meanings in L3#4; step 4).",
+    "refs": [
+     "L3#11",
+     "L3#12",
+     "L3#13",
+     "L3#4"
+    ]
+   },
+   {
+    "id": "recap",
+    "title": "Recap",
+    "kind": "recap",
+    "body": "- ACID (relational): strict guarantees, correctness first. BASE (NoSQL): availability and speed at scale.\n- BASE: basically available, soft state, eventually consistent.\n- Copies may differ briefly, then converge (the address example).\n- Strengths: causal, read-your-writes, session, monotonic read, monotonic write.\n- Charlie: the same two operations give $2,000 or $1,890 depending on order.",
+    "refs": [
+     "L3#10",
+     "L3#11",
+     "L3#12",
+     "L3#13"
+    ]
+   }
+  ],
+  "needs": [
+   {
+    "nodeId": "cap-theorem-and-two-phase-commit",
+    "why": "BASE is the availability-first side of the CAP trade-off."
+   },
+   {
+    "nodeId": "read-write-quorums",
+    "why": "The quorum example with no two-phase commit is where replicas briefly disagree."
+   }
+  ],
+  "related": [
+   {
+    "nodeId": "replication-design-scenarios",
+    "why": "Next step: decide when this looser model is acceptable."
+   }
+  ]
+ },
+ "slides": [
+  {
+   "id": "s1-acid-base",
+   "title": "ACID versus BASE",
+   "primitive": "compare",
+   "ref": "L3#10",
+   "spec": {
+    "columns": [
+     "ACID",
+     "BASE"
+    ],
+    "rows": [
+     [
+      "Family",
+      "The relational model",
+      "Common to NoSQL"
+     ],
+     [
+      "Guarantees",
+      "Strong, strict guarantees on every transaction, correctness first",
+      "Looser guarantees that favor availability and speed at scale"
+     ],
+     [
+      "Letters",
+      "Atomicity, Consistency, Isolation, Durability",
+      "Basically Available, Soft State, Eventually Consistent"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "s2-address",
+   "title": "The address update, replica by replica",
+   "primitive": "timeline",
+   "ref": "L3#11",
+   "provenance": "authored",
+   "spec": {
+    "events": [
+     {
+      "when": "t0",
+      "title": "The write",
+      "body": "A user updates her address on one server."
+     },
+     {
+      "when": "t0, instantly",
+      "title": "Nearby replica",
+      "body": "A nearby replica updates instantly."
+     },
+     {
+      "when": "t0 to t1",
+      "title": "Copies disagree",
+      "body": "A data center thousands of miles away lags: briefly, the copies disagree. A reader there may see the old address."
+     },
+     {
+      "when": "t1",
+      "title": "Converged",
+      "body": "Replication catches up and every copy holds the new address: eventually consistent."
+     }
+    ]
+   }
+  },
+  {
+   "id": "s3-strengths",
+   "title": "Five strengths, in the slides' order",
+   "primitive": "stepper",
+   "ref": "L3#12",
+   "spec": {
+    "steps": [
+     {
+      "title": "Causal consistency",
+      "body": "All copies reflect the order in which updates happened: a change to $1,000 lands everywhere before a later change to $2,000."
+     },
+     {
+      "title": "Read-your-writes",
+      "body": "Once you write a value, your own reads always return it."
+     },
+     {
+      "title": "Session consistency",
+      "body": "Read-your-writes holds, but only within one session. End the session and that guarantee may not carry over."
+     },
+     {
+      "title": "Monotonic read",
+      "body": "Once you have seen a value, you will never see an earlier version of it: reads only move forward in time (L3#13)."
+     },
+     {
+      "title": "Monotonic write",
+      "body": "Your writes execute in the order you issued them, essential when operations don't commute (L3#13)."
+     }
+    ]
+   }
+  },
+  {
+   "id": "s4-which",
+   "title": "Which guarantee is this?",
+   "primitive": "chooser",
+   "ref": "L3#13",
+   "provenance": "authored",
+   "spec": {
+    "intro": "Match each situation to the guarantee of L3#12 and L3#13 that it describes. The situations are ours, except the last one (L3#12).",
+    "choices": [
+     "Causal",
+     "Read-your-writes",
+     "Session",
+     "Monotonic read",
+     "Monotonic write"
+    ],
+    "cases": [
+     {
+      "scenario": "You post a comment, reload the page, and always see your comment.",
+      "answer": 1,
+      "why": "Your own reads always return what you wrote."
+     },
+     {
+      "scenario": "Inside one login session you always see your new profile photo; after logging in again you briefly see the old one.",
+      "answer": 2,
+      "why": "Read-your-writes, but only within one session."
+     },
+     {
+      "scenario": "Once you have seen the score 2-1, you never again see 1-1.",
+      "answer": 3,
+      "why": "Reads only move forward in time."
+     },
+     {
+      "scenario": "Your discount and your new order must be applied in the order you sent them.",
+      "answer": 4,
+      "why": "Your writes execute in the order you issued them; they don't commute."
+     },
+     {
+      "scenario": "A balance change to $1,000 reaches every copy before a later change to $2,000.",
+      "answer": 0,
+      "why": "All copies reflect the order in which updates happened."
+     }
+    ]
+   }
+  },
+  {
+   "id": "s5-charlie",
+   "title": "Charlie's bill: order matters",
+   "primitive": "kvrepl",
+   "ref": "L3#13",
+   "provenance": "authored",
+   "spec": {
+    "intro": "The command syntax is invented for this demo. The numbers are the L3#13 example: Charlie owes $1,000.",
+    "script": [
+     {
+      "cmd": "set charlie 1000",
+      "out": "charlie = $1,000",
+      "explain": "Charlie owes $1,000."
+     },
+     {
+      "cmd": "apply charlie discount 10%",
+      "out": "charlie = $900",
+      "explain": "Discount first."
+     },
+     {
+      "cmd": "apply charlie add 1100",
+      "out": "charlie = $2,000",
+      "explain": "$900 + $1,100 = $2,000."
+     },
+     {
+      "cmd": "reset charlie 1000",
+      "out": "charlie = $1,000",
+      "explain": "Start again with the same two operations in the other order."
+     },
+     {
+      "cmd": "apply charlie add 1100",
+      "out": "charlie = $2,100",
+      "explain": "The order first."
+     },
+     {
+      "cmd": "apply charlie discount 10%",
+      "out": "charlie = $1,890",
+      "explain": "$2,100 less 10% = $1,890. Same operations, different result: monotonic write consistency keeps your order."
+     }
+    ],
+    "hint": "Start with: set charlie 1000"
+   }
+  },
+  {
+   "id": "s6-link",
+   "title": "Where eventual consistency comes from",
+   "primitive": "text",
+   "ref": "L4#39",
+   "spec": {
+    "body": "Back to the step 5 example: write to 3 replicas, wait for 2, replica 3 is written in the background.\n\nThere is **no two-phase commit**, so replicas may briefly disagree but converge eventually. That window is exactly where the five strengths matter: they say what a reader may see while replica 3 is still behind. L4#39"
+   }
+  }
+ ],
+ "checkpoint": [
+  {
+   "id": "cp1",
+   "type": "mcq",
+   "prompt": "What does \"eventually consistent\" promise?",
+   "options": [
+    "Every read always returns the latest value",
+    "Copies may differ briefly, then converge to the same value once replication catches up",
+    "Copies never converge",
+    "Writes are refused until all replicas agree"
+   ],
+   "answer": 1,
+   "explanation": "L3#11: the copies can disagree for a while, but they converge once replication catches up.",
+   "ref": "L3#11",
+   "quote": "Copies may differ briefly, then converge to the same value once replication catches up."
+  },
+  {
+   "id": "cp2",
+   "type": "fill",
+   "prompt": "Monotonic ____ consistency: your writes execute in the order you issued them.",
+   "accepted": [
+    "write"
+   ],
+   "explanation": "Monotonic write is about the order of your writes; monotonic read is about never seeing an earlier version.",
+   "ref": "L3#13",
+   "quote": "Your writes execute in the order you issued them"
+  },
+  {
+   "id": "cp3",
+   "type": "multi",
+   "prompt": "Which of these are the letters of BASE?",
+   "options": [
+    "Basically Available",
+    "Soft State",
+    "Eventually Consistent",
+    "Isolation",
+    "Durability"
+   ],
+   "answers": [
+    0,
+    1,
+    2
+   ],
+   "explanation": "Isolation and Durability belong to ACID.",
+   "ref": "L3#10",
+   "quote": "Basically Available · Soft State · Eventually Consistent"
+  },
+  {
+   "id": "cp4",
+   "type": "mcq",
+   "prompt": "Charlie owes $1,000. A $1,100 order is added, then a 10% discount is applied. What does he owe?",
+   "options": [
+    "$2,000",
+    "$1,890",
+    "$2,100",
+    "$1,990"
+   ],
+   "answer": 1,
+   "explanation": "$1,000 + $1,100 = $2,100, less 10% = $1,890. In the other order the result is $2,000.",
+   "ref": "L3#13",
+   "quote": "$2,100 less 10% = $1,890",
+   "trap": "Answering $2,000, which is the discount-first order."
+  },
+  {
+   "id": "cp5",
+   "type": "short",
+   "prompt": "What is the difference between read-your-writes and session consistency?",
+   "modelAnswer": "Read-your-writes means that once you write a value, your own reads always return it: you never see a value older than the one you just wrote. Session consistency gives the same guarantee but only within one session; when the session ends, the guarantee may not carry over.",
+   "rubric": [
+    "Read-your-writes: your own reads always return what you wrote",
+    "You never see a value older than your own last write",
+    "Session: the same guarantee, but only within one session",
+    "After the session ends it may not carry over"
+   ],
+   "explanation": "L3#12 defines both, one after the other.",
+   "ref": "L3#12",
+   "quote": "Read-your-writes holds, but only within one session."
+  }
+ ],
+ "audit": {
+  "by": "claude-opus-5-5 self-audit (the authoring model, in a separate refute pass; not an independent reviewer)",
+  "refuted": 2,
+  "fixed": 2,
+  "at": "2026-10-18T10:30:00Z",
+  "note": "Refuted: a stepper title claimed the five strengths were ordered from the weakest promise, which the slides never say; a trap mapped the C of ACID to transaction consistency without saying it is our mapping. Fixed: title now says the slides' order; the trap is labelled as our mapping."
+ }
+}

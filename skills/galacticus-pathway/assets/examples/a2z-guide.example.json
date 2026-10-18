@@ -1,0 +1,307 @@
+{
+ "sections": [
+  {
+   "id": "howto",
+   "kind": "howto",
+   "title": "How to use this guide",
+   "intro": "The whole course on one page. Every line with a source chip is a course fact with a verbatim quote; lines without one are study guidance.",
+   "items": [
+    {
+     "text": "Play the seven steps in order: each one assumes the previous ones. Step 1 needs nothing."
+    },
+    {
+     "text": "After each step, answer its checkpoint before moving on; the final quiz mixes all seven steps."
+    },
+    {
+     "text": "Use this page for revision: the reference and small-facts sections hold every definition and number taught in the steps."
+    },
+    {
+     "text": "Lines marked as our reading (the ride-hailing answers, the conflict rules, R + W > N) are not course statements: do not quote them as the professor's."
+    }
+   ]
+  },
+  {
+   "id": "map",
+   "kind": "map",
+   "title": "The route, stage by stage",
+   "intro": "Five stages from zero to design decisions.",
+   "items": [
+    {
+     "text": "Stage 1, zero: why databases keep copies. Replication keeps multiple copies of data for availability.",
+     "ref": "L4#18",
+     "quote": "Keeping multiple copies of data for availability."
+    },
+    {
+     "text": "Stage 2, two ways to organise copies: master-slave (one master accepts writes) and masterless (all nodes accept reads and writes).",
+     "ref": "L4#10",
+     "quote": "All nodes accept reads and writes"
+    },
+    {
+     "text": "Stage 3, what consistency costs: the CAP theorem, the two-phase commit and quorums.",
+     "ref": "L3#3",
+     "quote": "A distributed database cannot guarantee all three of these at the same time"
+    },
+    {
+     "text": "Stage 4, eventual consistency: copies may differ briefly, then converge.",
+     "ref": "L3#11",
+     "quote": "Copies may differ briefly, then converge to the same value once replication catches up."
+    },
+    {
+     "text": "Stage 5, synthesis: accept a short window of inconsistency for speed, or pay for strict consistency.",
+     "ref": "L3#7",
+     "quote": "accept a short window of inconsistency in return for speed, trusting the copies to converge"
+    }
+   ]
+  },
+  {
+   "id": "reference",
+   "kind": "reference",
+   "title": "Must-know definitions and rules",
+   "intro": "Learn these word for word.",
+   "items": [
+    {
+     "text": "Cluster: a set of coordinated servers working together.",
+     "ref": "L4#18",
+     "quote": "A set of coordinated servers working together."
+    },
+    {
+     "text": "Replication saves multiple copies of data across the cluster, which gives high availability.",
+     "ref": "L4#38",
+     "quote": "Replication saves multiple copies of data across the cluster, which gives high availability."
+    },
+    {
+     "text": "Master-slave: one master node accepts writes; many slave/replica nodes serve reads.",
+     "ref": "L4#9",
+     "quote": "Many slave/replica nodes serve reads"
+    },
+    {
+     "text": "Masterless: scales writes, not just reads; must handle write conflicts between nodes.",
+     "ref": "L4#10",
+     "quote": "Must handle write conflicts between nodes"
+    },
+    {
+     "text": "Ring: a logical structure for organising partitions, each node linked to its two neighbours; each write goes to the owner and both neighbours.",
+     "ref": "L4#36",
+     "quote": "Each write goes to the owning node and its two neighbours, giving high availability."
+    },
+    {
+     "text": "CAP: consistency (all servers hold the same, current data), availability (every query gets a response), partition protection (works even if the network splits servers apart).",
+     "ref": "L3#3",
+     "quote": "All servers hold the same, current data."
+    },
+    {
+     "text": "Two meanings of consistency: transaction consistency (a valid state) and replica consistency (same values on every server).",
+     "ref": "L3#4",
+     "quote": "Replica consistency, copies of data on different servers hold the same values."
+    },
+    {
+     "text": "Two-phase commit: if either write fails, the whole transaction rolls back.",
+     "ref": "L3#5",
+     "quote": "If either write fails, the whole transaction rolls back"
+    },
+    {
+     "text": "Quorum: the number of servers that must respond for a read or write to count as complete.",
+     "ref": "L3#9",
+     "quote": "the number of servers that must respond for a read or write to count as complete"
+    },
+    {
+     "text": "BASE: Basically Available, Soft State, Eventually Consistent; ACID: Atomicity, Consistency, Isolation, Durability.",
+     "ref": "L3#10",
+     "quote": "Basically Available · Soft State · Eventually Consistent"
+    },
+    {
+     "text": "Read-your-writes: once you write a value, your own reads always return it; session consistency limits that to one session.",
+     "ref": "L3#12",
+     "quote": "Read-your-writes holds, but only within one session."
+    },
+    {
+     "text": "Monotonic read: never an earlier version once seen; monotonic write: writes execute in the order issued.",
+     "ref": "L3#13",
+     "quote": "Your writes execute in the order you issued them"
+    }
+   ]
+  },
+  {
+   "id": "niche",
+   "kind": "niche",
+   "title": "Small facts: numbers, names, commands",
+   "intro": "The details that make the difference in a recall question.",
+   "items": [
+    {
+     "text": "Quorum example on L3#9 uses 5 replicas: read threshold 1 is fastest but may return stale data.",
+     "ref": "L3#9",
+     "quote": "With 5 replicas: threshold 1 is fastest but may return stale data"
+    },
+    {
+     "text": "Read threshold 5 of 5 guarantees a consistent read but is slowest; 3 lets servers agree by majority.",
+     "ref": "L3#9",
+     "quote": "A middle value (e.g., 3) lets servers agree by majority"
+    },
+    {
+     "text": "Write threshold: at least 2, with more replicas than the threshold.",
+     "ref": "L3#9",
+     "quote": "Setting it to at least 2 (with more replicas than the threshold)"
+    },
+    {
+     "text": "L4#39: write to 3 replicas, wait for 2 acks; read waits for 2 matching answers.",
+     "ref": "L4#39",
+     "quote": "Write: 3 replicas, wait for 2"
+    },
+    {
+     "text": "Ring example: keys map to 0-95; 8 servers each own 12 values (S4 owns 36-47).",
+     "ref": "L4#36",
+     "quote": "a hash-like function maps each key to 0–95; 8 servers each own a range of 12 values"
+    },
+    {
+     "text": "Examples: Redis is master-slave, Riak is masterless.",
+     "ref": "L4#35",
+     "quote": "Example | Redis | Riak"
+    },
+    {
+     "text": "Redis lab ports (native): master 127.0.0.1 6379, replicas 6380 and 6381.",
+     "ref": "T3#25",
+     "quote": "the master is 127.0.0.1 6379, replicas use 6380 and 6381"
+    },
+    {
+     "text": "Redis: REPLICAOF NO ONE promotes a replica; INFO replication shows the role.",
+     "ref": "T3#29",
+     "quote": "REPLICAOF NO ONE"
+    },
+    {
+     "text": "Derby sizing: 250,000 score reads per second and 5 writes per second.",
+     "ref": "T3#28",
+     "quote": "250,000 score reads per second and 5 writes per second"
+    },
+    {
+     "text": "Ride-hailing exercise: the link between the two replicas is cut for 90 seconds.",
+     "ref": "L3#8",
+     "quote": "A network fault cuts the link between them for 90 seconds."
+    },
+    {
+     "text": "Charlie owes $1,000: discount then order gives $2,000, order then discount gives $1,890.",
+     "ref": "L3#13",
+     "quote": "$900 + $1,100 = $2,000"
+    },
+    {
+     "text": "Causal example: a change to $1,000 lands everywhere before a later change to $2,000.",
+     "ref": "L3#12",
+     "quote": "a change to $1,000 lands everywhere before a later change to $2,000"
+    },
+    {
+     "text": "Masterless conflict scenario time: 21:47:03, journalist A sends 2 to node 1, journalist B sends 1 to node 3.",
+     "ref": "T3#30",
+     "quote": "At 21:47:03, journalist A sends match:1001:homeGoals = 2 to node 1"
+    },
+    {
+     "text": "The CAP theorem's other name: Brewer's theorem.",
+     "ref": "L3#3",
+     "quote": "The CAP Theorem (Brewer's Theorem)"
+    }
+   ]
+  },
+  {
+   "id": "traps",
+   "kind": "traps",
+   "title": "Traps: where marks are lost",
+   "intro": "Each trap is a classic confusion from the steps.",
+   "items": [
+    {
+     "text": "Replicas scale reads, not writes, in master-slave: the single write point is a bottleneck and a risk.",
+     "ref": "L4#9",
+     "quote": "Single write point = bottleneck & risk"
+    },
+    {
+     "text": "Transaction consistency and replica consistency are two different meanings: don't confuse them.",
+     "ref": "L3#4",
+     "quote": "Two meanings, don't confuse them"
+    },
+    {
+     "text": "AP may return stale data; CP blocks some queries instead.",
+     "ref": "L3#6",
+     "quote": "Consistent + partition-tolerant, blocks some queries (availability suffers)."
+    },
+    {
+     "text": "The read threshold trades response against consistency; the write threshold trades response against durability.",
+     "ref": "L3#9",
+     "quote": "Write threshold → response vs. durability"
+    },
+    {
+     "text": "How many replicas (copies) is not the quorum (how many must answer); fewer replicas suit data that is easy to regenerate.",
+     "ref": "L4#38",
+     "quote": "Use when data is easy to regenerate and reload."
+    },
+    {
+     "text": "Session consistency is read-your-writes within one session only.",
+     "ref": "L3#12",
+     "quote": "Session consistency"
+    },
+    {
+     "text": "In the ring, a failed node's neighbours take over and later send it the writes it missed: no master is elected.",
+     "ref": "L4#37",
+     "quote": "S4 comes back: S3 and S5 send it the writes it missed."
+    }
+   ]
+  },
+  {
+   "id": "checklist",
+   "kind": "checklist",
+   "title": "Night-before checklist",
+   "intro": "Tick each line only if you can do it without notes.",
+   "items": [
+    {
+     "text": "I can define cluster, replication, replica and quorum in one sentence each."
+    },
+    {
+     "text": "I can say when to keep fewer or more replicas, and list the costs of many replicas."
+    },
+    {
+     "text": "I can compare master-slave and masterless row by row (writes, reads, master fails, node fails, example)."
+    },
+    {
+     "text": "I can walk through the ring example and its node failure in four steps."
+    },
+    {
+     "text": "I can state CAP, the two meanings of consistency, the two-phase commit and its price."
+    },
+    {
+     "text": "I can explain both quorum dials with the 5-replica example and the 3-replica, wait-for-2 example."
+    },
+    {
+     "text": "I can name the five strengths of eventual consistency and redo Charlie's two totals."
+    },
+    {
+     "text": "I can defend a design for the bank, the cart, the ride-hailing split and the live-score site."
+    }
+   ]
+  },
+  {
+   "id": "route",
+   "kind": "route",
+   "title": "Core-first order",
+   "intro": "Every step is core, so the core-first order is the A-to-Z order itself. If you have only one evening, do steps 4 to 6 after a five-minute look at step 1: they carry most of the definitions.",
+   "items": [
+    {
+     "text": "1. Replication and how many replicas (step 1)."
+    },
+    {
+     "text": "2. Master-slave replication (step 2)."
+    },
+    {
+     "text": "3. Masterless replication and the ring (step 3)."
+    },
+    {
+     "text": "4. CAP, two meanings of consistency and the two-phase commit (step 4)."
+    },
+    {
+     "text": "5. Quorums: read and write thresholds (step 5)."
+    },
+    {
+     "text": "6. ACID versus BASE and the strengths of eventual consistency (step 6)."
+    },
+    {
+     "text": "7. Synthesis scenarios (step 7)."
+    }
+   ]
+  }
+ ]
+}

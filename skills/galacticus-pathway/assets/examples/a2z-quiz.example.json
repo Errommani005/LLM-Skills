@@ -1,0 +1,240 @@
+{
+ "profile": {
+  "subject": "NoSQL",
+  "confidence": "inferred",
+  "notes": "FINAL QUIZ of this A-to-Z course: a practice check written for the course, not the professor's exam. The 20 minutes and the points are the quiz's own design, not facts about any exam."
+ },
+ "blueprint": {
+  "durationMin": 20,
+  "totalPoints": 14,
+  "sections": [
+   {
+    "id": "A",
+    "title": "Facts and definitions",
+    "form": "recall",
+    "count": 6,
+    "points": 6
+   },
+   {
+    "id": "B",
+    "title": "Scenarios",
+    "form": "scenario",
+    "count": 4,
+    "points": 8
+   }
+  ]
+ },
+ "mock": {
+  "questions": [
+   {
+    "id": "Q01",
+    "type": "mcq",
+    "form": "recall",
+    "points": 1,
+    "prompt": "When does the course recommend keeping more replicas?",
+    "options": [
+     "When data is easy to regenerate and reload",
+     "When you have little tolerance for data loss",
+     "When writes must be as fast as possible",
+     "When the cluster has a single server"
+    ],
+    "answer": 1,
+    "explanation": "More replicas make data loss less likely, at a possible cost in performance. Fewer replicas suit data that is easy to regenerate and reload.",
+    "ref": "L4#38",
+    "quote": "Use when you have little tolerance for data loss.",
+    "nodeIds": [
+     "replication-and-replicas"
+    ]
+   },
+   {
+    "id": "Q02",
+    "type": "fill",
+    "form": "recall",
+    "points": 1,
+    "prompt": "In the Redis lab's manual failover, the command ____ turns replica 1 into the new master.",
+    "accepted": [
+     "REPLICAOF NO ONE",
+     "replicaof no one",
+     "SLAVEOF NO ONE"
+    ],
+    "explanation": "Task 3.4 promotes replica 1 with REPLICAOF NO ONE, then attaches replica 2 to it. (SLAVEOF NO ONE is the older Redis spelling of the same command; it is not in the lab.)",
+    "ref": "T3#29",
+    "quote": "REPLICAOF NO ONE",
+    "nodeIds": [
+     "master-slave-replication"
+    ]
+   },
+   {
+    "id": "Q03",
+    "type": "mcq",
+    "form": "recall",
+    "points": 1,
+    "prompt": "In the ring example, keys map to 0-95 across 8 servers. How many values does each server own?",
+    "options": [
+     "8",
+     "12",
+     "24",
+     "96"
+    ],
+    "answer": 1,
+    "explanation": "96 values over 8 servers: each owns a range of 12 (S1 0-11, S2 12-23, and so on).",
+    "ref": "L4#36",
+    "quote": "8 servers each own a range of 12 values",
+    "nodeIds": [
+     "masterless-replication-and-ring"
+    ]
+   },
+   {
+    "id": "Q04",
+    "type": "multi",
+    "form": "recall",
+    "points": 1,
+    "prompt": "Which three properties does the CAP theorem say a distributed database cannot guarantee all at the same time?",
+    "options": [
+     "Consistency",
+     "Availability",
+     "Partition protection",
+     "Durability",
+     "Isolation"
+    ],
+    "answers": [
+     0,
+     1,
+     2
+    ],
+    "explanation": "Consistency, availability and partition protection. Durability and isolation are ACID letters.",
+    "ref": "L3#3",
+    "quote": "A distributed database cannot guarantee all three of these at the same time",
+    "nodeIds": [
+     "cap-theorem-and-two-phase-commit"
+    ],
+    "trap": "Mixing the CAP letters with the ACID letters."
+   },
+   {
+    "id": "Q05",
+    "type": "fill",
+    "form": "recall",
+    "points": 1,
+    "prompt": "A higher read quorum gives fresher data, at the cost of higher ____.",
+    "accepted": [
+     "latency"
+    ],
+    "explanation": "L4#39: waiting for more matching answers means waiting for slower replicas.",
+    "ref": "L4#39",
+    "quote": "A higher read quorum gives fresher data, at the cost of higher latency.",
+    "nodeIds": [
+     "read-write-quorums"
+    ]
+   },
+   {
+    "id": "Q06",
+    "type": "mcq",
+    "form": "recall",
+    "points": 1,
+    "prompt": "Which strength of eventual consistency guarantees that reads only move forward in time?",
+    "options": [
+     "Causal consistency",
+     "Session consistency",
+     "Monotonic read consistency",
+     "Monotonic write consistency"
+    ],
+    "answer": 2,
+    "explanation": "Monotonic read: once you have seen a value, you will never see an earlier version of it. Monotonic write is about the order of your writes.",
+    "ref": "L3#13",
+    "quote": "reads only move forward in time",
+    "nodeIds": [
+     "eventual-consistency-and-base"
+    ],
+    "trap": "Confusing monotonic read with monotonic write."
+   },
+   {
+    "id": "Q07",
+    "type": "short",
+    "form": "scenario",
+    "points": 2,
+    "prompt": "Task 3.5: on a masterless cluster, at 21:47:03 journalist A sends match:1001:homeGoals = 2 to node 1 while journalist B sends match:1001:homeGoals = 1 to node 3. Why can this conflict happen here but not on the Redis master-slave set-up, and what simple rule could decide which value wins?",
+    "modelAnswer": "In a masterless cluster every node accepts writes, so two nodes can accept different values for the same key: masterless replication must handle write conflicts between nodes. In Redis master-slave only the master accepts writes, so both journalists would write to the same place in some order. A simple rule: keep the highest value, because a goal count only rises during a match (last write wins would need a tie-breaker, since both writes carry the same second).",
+    "rubric": [
+     "Masterless: any node accepts writes, so two nodes can hold different values",
+     "Master-slave: only the master accepts writes, so no conflict between nodes",
+     "Proposes one simple rule (for example highest value or last write wins)",
+     "Justifies the rule for this scenario (goals only rise, or the same-second tie)"
+    ],
+    "explanation": "L4#10 says masterless must handle write conflicts between nodes; the course asks you to propose the rule and gives no official one.",
+    "ref": "T3#30",
+    "quote": "sends match:1001:homeGoals = 1 to node 3",
+    "nodeIds": [
+     "masterless-replication-and-ring",
+     "master-slave-replication"
+    ]
+   },
+   {
+    "id": "Q08",
+    "type": "mcq",
+    "form": "scenario",
+    "points": 2,
+    "prompt": "A report runs against 5 replicas and must read a consistent value, even if it is the slowest read. Which read threshold does the course give for that?",
+    "options": [
+     "1",
+     "2",
+     "3",
+     "5"
+    ],
+    "answer": 3,
+    "explanation": "With 5 replicas, threshold 5 guarantees a consistent read but is slowest. Threshold 1 is fastest but may be stale; 3 agrees by majority.",
+    "ref": "L3#9",
+    "quote": "threshold 5 guarantees a consistent read but is slowest",
+    "nodeIds": [
+     "read-write-quorums"
+    ],
+    "trap": "Choosing 3: the slide calls it majority agreement, not a guaranteed consistent read."
+   },
+   {
+    "id": "Q09",
+    "type": "multi",
+    "form": "scenario",
+    "points": 2,
+    "prompt": "During the 90-second split of the ride-hailing exercise, the app favours CP. Which consequences follow from the course's definition of CP?",
+    "options": [
+     "Some queries are blocked",
+     "Availability suffers",
+     "Replicas may return stale data",
+     "The data stays consistent",
+     "Every query still gets a response"
+    ],
+    "answers": [
+     0,
+     1,
+     3
+    ],
+    "explanation": "CP is consistent and partition-tolerant and blocks some queries, so availability suffers. Returning stale data is the AP behaviour, and a response to every query is availability.",
+    "ref": "L3#6",
+    "quote": "Consistent + partition-tolerant, blocks some queries (availability suffers).",
+    "nodeIds": [
+     "cap-theorem-and-two-phase-commit",
+     "replication-design-scenarios"
+    ]
+   },
+   {
+    "id": "Q10",
+    "type": "short",
+    "form": "scenario",
+    "points": 2,
+    "prompt": "A user updates her address on one server; a nearby replica updates instantly but a data center thousands of miles away lags. Which BASE property describes this, and which guarantee would make sure she herself never sees her old address after the update?",
+    "modelAnswer": "Eventually consistent: copies may differ briefly, then converge once replication catches up. To make sure she never sees her old address after writing the new one, the system needs read-your-writes consistency (or session consistency, if it is enough within her current session).",
+    "rubric": [
+     "Names eventual consistency (the E of BASE)",
+     "Copies differ briefly, then converge once replication catches up",
+     "Names read-your-writes",
+     "Mentions session consistency as the one-session variant"
+    ],
+    "explanation": "L3#11 gives the address example; L3#12 defines read-your-writes and session consistency.",
+    "ref": "L3#11",
+    "quote": "a data center thousands of miles away lags",
+    "nodeIds": [
+     "eventual-consistency-and-base"
+    ]
+   }
+  ]
+ }
+}

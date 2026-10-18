@@ -1,0 +1,244 @@
+{
+ "nodes": [
+  {
+   "id": "quorum-and-replication-factor",
+   "label": "Quorum, read/write thresholds and replication factor",
+   "kind": "concept",
+   "category": "technical",
+   "priority": "core",
+   "estMin": 10,
+   "refs": ["L3#9", "L4#18", "L4#38", "L4#39", "L4#45", "L5#16"],
+   "card": {
+    "definition": "A quorum is the number of servers or replicas that must respond for a read or write to count as complete. Read and write thresholds trade speed against consistency and durability, and the replication factor (how many replicas are kept) trades performance against risk of data loss.",
+    "keyFacts": [
+     {
+      "ref": "L3#9",
+      "text": "With 5 replicas, a read threshold of 1 is the fastest but may return stale data.",
+      "quote": "threshold 1 is fastest but may return stale data"
+     },
+     {
+      "ref": "L3#9",
+      "text": "With 5 replicas, a read threshold of 5 guarantees a consistent read but is the slowest.",
+      "quote": "threshold 5 guarantees a consistent read but is slowest"
+     },
+     {
+      "ref": "L3#9",
+      "text": "A middle read threshold value, for example 3 with 5 replicas, lets servers agree by majority.",
+      "quote": "A middle value (e.g., 3) lets servers agree by majority"
+     },
+     {
+      "ref": "L3#9",
+      "text": "A write threshold of 1 is fast but risky: if that single server is lost, the data is gone.",
+      "quote": "lose that server and the data is gone"
+     },
+     {
+      "ref": "L3#9",
+      "text": "Setting the write threshold to at least 2, with more replicas than the threshold, protects durability without slowing writes much.",
+      "quote": "Setting it to at least 2 (with more replicas than the threshold)"
+     },
+     {
+      "ref": "L4#38",
+      "text": "Fewer replicas give better performance but a higher risk of losing data; use them when data is easy to regenerate and reload.",
+      "quote": "Use when data is easy to regenerate and reload."
+     },
+     {
+      "ref": "L4#39",
+      "text": "With 3 replicas and a write quorum of 2, success is returned after 2 acks (replicas 1 and 2) while replica 3 is written in the background, and the app moves on.",
+      "quote": "Write: 3 replicas, wait for 2"
+     },
+     {
+      "ref": "L4#39",
+      "text": "Replicas 1 and 2 answer v2 while replica 3 answers the stale v1; two agree, so v2 is returned to the application.",
+      "quote": "Read: wait for 2 matching answers"
+     }
+    ]
+   },
+   "anchors": [
+    {"ref": "L3#9", "quote": "the number of servers that must respond for a read or write to count as complete"},
+    {"ref": "L3#9", "quote": "Read threshold → response vs. consistency"},
+    {"ref": "L4#38", "quote": "KEY PARAMETER: HOW MANY REPLICAS?"}
+   ],
+   "covers": [
+    "L3-29",
+    "L3-30",
+    "L3-31",
+    "L3-32",
+    "L3-33",
+    "L3-34",
+    "L3-35",
+    "L3-36",
+    "L3-37",
+    "L4-65",
+    "L4-137",
+    "L4-138",
+    "L4-139",
+    "L4-140",
+    "L4-141",
+    "L4-142",
+    "L4-144",
+    "L4-164",
+    "L5-76",
+    "L5-77"
+   ],
+   "origin": "lesson"
+  },
+  {
+   "id": "shard-key-selection",
+   "label": "Choosing and fixing a shard key",
+   "kind": "skill",
+   "category": "technical",
+   "priority": "core",
+   "estMin": 9,
+   "refs": ["L2#22", "L2#23", "L2#24", "L2#25", "L2#26"],
+   "card": {
+    "definition": "A good shard key spreads data evenly; a poor one creates a hotspot. Judge a key by monotonic change (always-increasing keys send all writes to the last shard), value frequency (common values overload one shard) and cardinality (few distinct values cap the shard count), then apply the matching fix.",
+    "keyFacts": [
+     {
+      "ref": "L2#23",
+      "text": "Three properties of the key drive even distribution: monotonic change, frequency and cardinality.",
+      "quote": "Three properties of the key drive even distribution:"
+     },
+     {
+      "ref": "L2#23",
+      "text": "Timestamps and auto-increment IDs are the examples given of keys that only ever increase.",
+      "quote": "Keys that only ever increase (timestamps, auto-increment IDs)"
+     },
+     {
+      "ref": "L2#23",
+      "text": "Low cardinality, for example a Yes/No key, caps how many shards you can use.",
+      "quote": "Low cardinality (e.g. Yes/No) caps how many shards you can use."
+     },
+     {
+      "ref": "L2#24",
+      "text": "Example ranges: Shard 1 holds 0 to 10, Shard 2 holds 11 to 20, Shard 3 holds 21 or more, the open-ended last range where new records land.",
+      "quote": "Shard 1: 0–10"
+     },
+     {
+      "ref": "L2#25",
+      "text": "Example ranges are 18 to 29, 30 to 45 and 46 to 80; the 30-45 range holds six records (Philip, Mollie, Mahnoor, Saira, David, Phyllis) and a hotspot is flagged.",
+      "quote": "Shard 1: 18–29"
+     },
+     {
+      "ref": "L2#25",
+      "text": "Fix: pick a key with more uniform value frequencies, or combine it with a secondary key.",
+      "quote": "Fix: pick a key with more uniform value frequencies, or combine it with a secondary key."
+     },
+     {
+      "ref": "L2#26",
+      "text": "With only two possible values (Yes / No) there are at most two shards, and they rarely balance.",
+      "quote": "Only two possible values (Yes / No) → at most two shards, and they rarely balance."
+     },
+     {
+      "ref": "L2#26",
+      "text": "Fix: choose a high-cardinality key, one with many distinct values, so data divides evenly across shards.",
+      "quote": "Fix: choose a high-cardinality key (many distinct values) so data divides evenly across shards."
+     }
+    ]
+   },
+   "anchors": [
+    {"ref": "L2#22", "quote": "How to optimize database sharding for even data distribution?"},
+    {
+     "ref": "L2#23",
+     "quote": "A poor shard key sends a disproportionate share of data or traffic to one shard – a hotspot."
+    },
+    {
+     "ref": "L2#24",
+     "quote": "Fix: hash the key or add a random / composite component so new records spread across all shards."
+    }
+   ],
+   "covers": [
+    "L2-60",
+    "L2-61",
+    "L2-62",
+    "L2-63",
+    "L2-64",
+    "L2-65",
+    "L2-66",
+    "L2-67",
+    "L2-68",
+    "L2-69",
+    "L2-70",
+    "L2-71",
+    "L2-72",
+    "L2-73",
+    "L2-74",
+    "L2-75",
+    "L2-76",
+    "L2-77"
+   ],
+   "origin": "lesson"
+  },
+  {
+   "id": "codd-relational-model-1970",
+   "label": "Codd and the relational model (1970)",
+   "kind": "event",
+   "category": "historical",
+   "priority": "standard",
+   "estMin": 4,
+   "refs": ["L1#9"],
+   "card": {
+    "definition": "In 1970 Codd published the relational model, built on relational algebra. It separated the logical organization of data from physical storage and, with SQL as one shared declarative language, ended the need for a custom program per file.",
+    "keyFacts": [
+     {
+      "ref": "L1#9",
+      "text": "In 1970 E. F. Codd published the relational model, starting the relational database revolution.",
+      "quote": "1970 E. F. Codd publishes the relational model,"
+     },
+     {
+      "ref": "L1#9",
+      "text": "The logical organization of data is separated from how it is physically stored, so programs no longer break when storage changes.",
+      "quote": "The logical organization of data is separated from how it is physically stored."
+     },
+     {
+      "ref": "L1#9",
+      "text": "SQL is one standardized language across systems in which you state WHAT data you want, not HOW to fetch it.",
+      "quote": "One standardized language across systems."
+     }
+    ]
+   },
+   "anchors": [
+    {"ref": "L1#9", "quote": "1970 E. F. Codd publishes the relational model,"},
+    {"ref": "L1#9", "quote": "built on relational algebra, a formal mathematical foundation."},
+    {"ref": "L1#9", "quote": "no more custom program per file"}
+   ],
+   "covers": ["L1-18", "L1-19", "L1-20", "L1-21", "L1-22"],
+   "origin": "lesson"
+  },
+  {
+   "id": "cap-bank-vs-cart-scenarios",
+   "label": "CAP trade-offs: bank versus shopping cart",
+   "kind": "scenario",
+   "category": "situational",
+   "priority": "core",
+   "estMin": 5,
+   "refs": ["L2#31", "L3#7"],
+   "card": {
+    "definition": "Banks need consistency and availability at all times and accept the time cost of two-phase commit. A shopping cart is AP: add-to-cart must feel instant and a brief inconsistency is fine. Partitions are rare on local networks, so designers mostly trade consistency against speed.",
+    "keyFacts": [
+     {
+      "ref": "L2#31",
+      "text": "The cart is the example given for an AP system that may return stale data.",
+      "quote": "may return stale data (the cart)"
+     },
+     {
+      "ref": "L2#31",
+      "text": "Partitions are rare on local networks, so designers mostly trade consistency against availability.",
+      "quote": "In practice, partitions are rare on local networks, so designers mostly trade consistency against availability."
+     },
+     {
+      "ref": "L3#7",
+      "text": "Banks and financial systems need both consistency and availability at all times; the extra time of a two-phase commit is worth it because a wrong balance is unacceptable.",
+      "quote": "A two-phase commit is worth the extra time"
+     }
+    ]
+   },
+   "anchors": [
+    {"ref": "L3#7", "quote": "A two-phase commit is worth the extra time"},
+    {"ref": "L3#7", "quote": "must feel instant"},
+    {"ref": "L3#7", "quote": "The Consistency vs. Speed Trade-off"}
+   ],
+   "covers": ["L2-103", "L2-104", "L3-20", "L3-21", "L3-23"],
+   "origin": "lesson"
+  }
+ ]
+}

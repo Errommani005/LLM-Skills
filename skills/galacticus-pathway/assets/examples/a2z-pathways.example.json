@@ -1,0 +1,61 @@
+{
+ "pathways": [
+  {
+   "id": "main",
+   "name": "A-to-Z: replication, quorums and consistency",
+   "kind": "main",
+   "why": "From zero: first the vocabulary (why copies exist), then the two ways to organise copies, then what consistency costs and how quorums tune it, then eventual consistency, and last design scenarios that need all of it.",
+   "stages": [
+    {
+     "title": "Zero: why databases keep copies",
+     "why": "Every later step talks about replicas, clusters and how many copies to keep; this stage gives that vocabulary.",
+     "nodeIds": [
+      "replication-and-replicas"
+     ]
+    },
+    {
+     "title": "Two ways to organise the copies",
+     "why": "Master-slave is the simpler model (one writer); masterless and the ring make sense once you know what a single write point costs.",
+     "nodeIds": [
+      "master-slave-replication",
+      "masterless-replication-and-ring"
+     ]
+    },
+    {
+     "title": "What consistency costs",
+     "why": "CAP and the two-phase commit show the price of strict consistency; quorums are the dial that tunes it.",
+     "nodeIds": [
+      "cap-theorem-and-two-phase-commit",
+      "read-write-quorums"
+     ]
+    },
+    {
+     "title": "Living with eventual consistency",
+     "why": "Once replicas may briefly disagree, you need BASE and the five strengths of eventual consistency to say exactly what a reader may see.",
+     "nodeIds": [
+      "eventual-consistency-and-base"
+     ]
+    },
+    {
+     "title": "Synthesis: design for the scenario",
+     "why": "Bank, cart, ride-hailing and live scores: apply every earlier step to choose replicas, model, CAP side and quorums.",
+     "nodeIds": [
+      "replication-design-scenarios"
+     ]
+    }
+   ]
+  }
+ ],
+ "deviations": [
+  {
+   "nodeId": "replication-and-replicas",
+   "movedBefore": "cap-theorem-and-two-phase-commit",
+   "why": "The course teaches CAP (L3) before the replication models (L4); this course starts from the vocabulary of copies because CAP is about replicas."
+  },
+  {
+   "nodeId": "master-slave-replication",
+   "movedBefore": "cap-theorem-and-two-phase-commit",
+   "why": "Knowing one writer versus many writers first makes the CAP trade-offs concrete; the lectures order them the other way round."
+  }
+ ]
+}

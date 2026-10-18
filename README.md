@@ -16,6 +16,10 @@ Each skill is self-contained in its own independent folder and includes its own 
 │   ├── context-handoff/
 │   ├── context-resume/
 │   ├── external-delegation/
+│   ├── galacticus-maker/
+│   ├── galacticus-pathway/
+│   ├── game-builder/
+│   ├── game-idea-to-build-prompt/
 │   ├── ghosty-spec/
 │   ├── project-uphaul/
 │   ├── scenario-coverage-testing/
@@ -109,6 +113,38 @@ Produces a complete, structured, printable course revision guide from attached c
 - **Multi-Part Splitting:** Automatically partitions extensive course materials into clean, numbered multi-part guides when content exceeds single-output constraints.
 - **Publication Ready:** Formats output with complete document structure, tables of contents, standardized mathematical notation, and artifact-completion signaling.
 *Use this when you need a complete, exhaustive, printable course guide or revision handout from lecture notes, slides, or textbooks instead of a surface-level summary.*
+### 11. `galacticus-maker`
+**Course Files → Galacticus Skill-Tree Study Pack**
+Turns course files (slides, PDFs, notes, past papers) into a "galaxy": a validated skill tree of topic nodes with verbatim-quoted key facts, links, and the teacher's pathway.
+- **Full Lessons:** Nodes on the learner's focus pathways get a guide, an interactive presentation, and a checkpoint; the galaxy also includes a main guide and a practice paper.
+- **Validated Output:** Bundled scripts check ids, references, quote matching, lesson completeness, and hashes until the validator reports 0 errors.
+- **Delivery:** A `.galaxy` file plus a self-contained offline HTML reader; supports handoff packages and "next part" continuation of an existing galaxy.
+*Use this to turn a whole subject into an explorable study map.*
+
+### 12. `galacticus-pathway`
+**One Lesson → A-to-Z Interactive Course**
+Builds a pathway-profile galaxy from a single lesson, lecture, or chapter that takes a learner from zero to mastery.
+- **Ordered Steps:** Each step has a quote-grounded card, a guide, an interactive presentation (steppers, flows, comparisons, sandboxes, terminal replays), and a checkpoint.
+- **A-to-Z Guide & Final Quiz:** The whole lesson on one page, plus a closing quiz.
+- **Delivery:** A `.galaxy` file and one self-contained HTML page, validated by the bundled scripts.
+*Use this for "teach me this lesson step by step"; for a whole subject use `galacticus-maker`.*
+
+### 13. `game-builder`
+**Agent-Built Games with One Standard**
+A fixed architecture, code style, and vetted $0 toolchain for building complete, playable, human-readable games with an AI agent (Godot 4 by default; mapped to Unity and Unreal Engine 5).
+- **Per-Genre Playbooks:** Party/co-op, platformer, shooter, racing, puzzle, strategy, survival, and more, solo or multiplayer.
+- **Agents, Templates & Scripts:** Specialist agent definitions, code templates, a project scaffolder, a structure checker, boot-gate and networking tests.
+- **Reference Library:** Engines, MCP tools, assets (CC0), networking, architecture, and QA checklists.
+*Use this to make, extend, or structure a game of any type.*
+
+### 14. `game-idea-to-build-prompt`
+**Game Idea → Build Prompt**
+Guides a discussion that settles a game's vision, mechanics, style, engine, and toolchain, then writes one structured build prompt for a coding agent.
+- **Discussion First:** Captures the idea, checks $0 feasibility, recommends style and engine, and runs a toolchain round.
+- **Verified Prompt:** Includes a checker script and a worked example; the prompt is self-contained.
+- **Companion:** Pairs with `game-builder`, but works without it.
+*Use this when pitching a game idea and you want a ready-to-hand-off build prompt.*
+
 ## How to Use
 
 This repository offers skills in two different formats depending on where you intend to use them:

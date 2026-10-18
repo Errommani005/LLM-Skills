@@ -1,0 +1,563 @@
+{
+ "nodes": [
+  {
+   "id": "replication-and-replicas",
+   "label": "Replication: clusters, replicas and how many copies",
+   "kind": "concept",
+   "category": "technical",
+   "priority": "core",
+   "estMin": 10,
+   "card": {
+    "definition": "Replication keeps multiple copies of the same data on several servers of a cluster, so the system keeps serving when one server fails. How many replicas to keep trades performance against the risk of losing data.",
+    "keyFacts": [
+     {
+      "text": "A cluster is a set of coordinated servers working together.",
+      "ref": "L4#18",
+      "quote": "A set of coordinated servers working together."
+     },
+     {
+      "text": "Replication means keeping multiple copies of data for availability.",
+      "ref": "L4#18",
+      "quote": "Keeping multiple copies of data for availability."
+     },
+     {
+      "text": "Replication saves multiple copies of data across the cluster, which gives high availability.",
+      "ref": "L4#38",
+      "quote": "Replication saves multiple copies of data across the cluster, which gives high availability."
+     },
+     {
+      "text": "Fewer replicas: better performance but a higher risk of losing data; use them when data is easy to regenerate and reload.",
+      "ref": "L4#38",
+      "quote": "Use when data is easy to regenerate and reload."
+     },
+     {
+      "text": "More replicas: less likely to lose data but possibly lower performance; use them when you have little tolerance for data loss.",
+      "ref": "L4#38",
+      "quote": "Use when you have little tolerance for data loss."
+     },
+     {
+      "text": "Many replicas bring higher availability, durability and read throughput, at the cost of more storage, slower writes and harder consistency.",
+      "ref": "L5#16",
+      "quote": "Cons are more storage, slower writes and harder consistency."
+     },
+     {
+      "text": "A lone server with an idle backup wastes capacity: the backup does no useful work until a failure.",
+      "ref": "L1#36",
+      "quote": "reserved capacity that does no useful work until a failure"
+     },
+     {
+      "text": "In a multi-server cluster with replicated data, the remaining servers carry the full workload when one fails; performance may dip but the app stays up.",
+      "ref": "L1#36",
+      "quote": "the others carry the full workload, performance may dip, but the app stays up"
+     },
+     {
+      "text": "Scaling out (adding servers) is more flexible than scaling up (a bigger single server).",
+      "ref": "L1#33",
+      "quote": "Scaling out is more flexible than scaling up"
+     }
+    ]
+   },
+   "refs": [
+    "L1#33",
+    "L1#36",
+    "L4#18",
+    "L4#38",
+    "L4#45",
+    "L5#16"
+   ],
+   "anchors": [
+    {
+     "ref": "L4#38",
+     "quote": "HOW MANY REPLICAS?"
+    }
+   ]
+  },
+  {
+   "id": "master-slave-replication",
+   "label": "Master-slave replication: one writer, many readers",
+   "kind": "concept",
+   "category": "technical",
+   "priority": "core",
+   "estMin": 12,
+   "card": {
+    "definition": "In master-slave replication one master node accepts the writes and replica (slave) nodes serve the reads. It scales read-heavy workloads well, but the single write point is both a bottleneck and a risk. Redis works this way.",
+    "keyFacts": [
+     {
+      "text": "One master node accepts writes.",
+      "ref": "L4#9",
+      "quote": "One master node accepts writes"
+     },
+     {
+      "text": "Many slave (replica) nodes serve reads.",
+      "ref": "L4#9",
+      "quote": "Many slave/replica nodes serve reads"
+     },
+     {
+      "text": "Master-slave replication scales read-heavy workloads well.",
+      "ref": "L4#9",
+      "quote": "Scales read-heavy workloads well"
+     },
+     {
+      "text": "The single write point is a bottleneck and a risk.",
+      "ref": "L4#9",
+      "quote": "Single write point = bottleneck & risk"
+     },
+     {
+      "text": "Read-heavy example: fans refreshing a live score site make many reads and few writes.",
+      "ref": "L4#9",
+      "quote": "fans refreshing a live score site many reads, few writes"
+     },
+     {
+      "text": "When the master fails, the remaining nodes elect a new master; when a slave fails, the other slaves keep serving reads.",
+      "ref": "L4#35",
+      "quote": "Remaining nodes elect a new master"
+     },
+     {
+      "text": "Redis is the course's example of master-slave replication.",
+      "ref": "T3#30",
+      "quote": "Redis uses master-slave replication."
+     },
+     {
+      "text": "In Redis a replica is configured with replicaof and inspected with INFO replication.",
+      "ref": "T3#25",
+      "quote": "configure master-slave replication with replicaof and inspect it with INFO replication"
+     },
+     {
+      "text": "In the lab (native install) the master listens on 127.0.0.1 port 6379 and the replicas use 6380 and 6381.",
+      "ref": "T3#25",
+      "quote": "the master is 127.0.0.1 6379, replicas use 6380 and 6381"
+     },
+     {
+      "text": "Manual failover: REPLICAOF NO ONE promotes a replica to master.",
+      "ref": "T3#29",
+      "quote": "REPLICAOF NO ONE"
+     },
+     {
+      "text": "The derby sizing task expects 250,000 score reads per second and 5 writes per second.",
+      "ref": "T3#28",
+      "quote": "250,000 score reads per second and 5 writes per second"
+     }
+    ]
+   },
+   "refs": [
+    "L4#8",
+    "L4#9",
+    "L4#35",
+    "T3#25",
+    "T3#26",
+    "T3#27",
+    "T3#28",
+    "T3#29"
+   ],
+   "anchors": [
+    {
+     "ref": "L4#9",
+     "quote": "Master-slave replication"
+    }
+   ]
+  },
+  {
+   "id": "masterless-replication-and-ring",
+   "label": "Masterless replication and the ring",
+   "kind": "concept",
+   "category": "technical",
+   "priority": "core",
+   "estMin": 12,
+   "card": {
+    "definition": "In masterless replication every node accepts reads and writes, so writes scale too and there is no single master to lose. The price: the database must handle write conflicts between nodes. Partitions are often organised in a ring where each write also lands on the owning node's two neighbours.",
+    "keyFacts": [
+     {
+      "text": "In masterless replication all nodes accept reads and writes.",
+      "ref": "L4#10",
+      "quote": "All nodes accept reads and writes"
+     },
+     {
+      "text": "Masterless replication scales writes, not just reads, and gives higher availability.",
+      "ref": "L4#10",
+      "quote": "Scales writes, not just reads"
+     },
+     {
+      "text": "A masterless database must handle write conflicts between nodes.",
+      "ref": "L4#10",
+      "quote": "Must handle write conflicts between nodes"
+     },
+     {
+      "text": "In a masterless cluster there is no single master to lose; other nodes take over a failed node's reads and writes.",
+      "ref": "L4#35",
+      "quote": "Other nodes take over its reads and writes"
+     },
+     {
+      "text": "Riak is the course's example of a masterless database.",
+      "ref": "L4#35",
+      "quote": "Example | Redis | Riak"
+     },
+     {
+      "text": "A ring is a logical structure for organising partitions: each node is linked to its two neighbours.",
+      "ref": "L4#36",
+      "quote": "each node is linked to its two neighbours"
+     },
+     {
+      "text": "Ring example: a hash-like function maps each key to 0-95 and 8 servers each own a range of 12 values.",
+      "ref": "L4#36",
+      "quote": "8 servers each own a range of 12 values"
+     },
+     {
+      "text": "Each write goes to the owning node and its two neighbours, giving high availability.",
+      "ref": "L4#36",
+      "quote": "Each write goes to the owning node and its two neighbours, giving high availability."
+     },
+     {
+      "text": "When S4 fails, S3 and S5 answer reads and accept writes for S4's data, then send S4 the writes it missed when it comes back.",
+      "ref": "L4#37",
+      "quote": "S4 comes back: S3 and S5 send it the writes it missed."
+     },
+     {
+      "text": "The typical key-value cluster is masterless (peer-to-peer), often arranged as a ring, with no single point of failure.",
+      "ref": "L5#16",
+      "quote": "Every node is equal, so there is no single point of failure."
+     }
+    ]
+   },
+   "refs": [
+    "L4#10",
+    "L4#35",
+    "L4#36",
+    "L4#37",
+    "L5#16",
+    "T3#30"
+   ],
+   "anchors": [
+    {
+     "ref": "L4#36",
+     "quote": "A ring is a logical structure for organizing partitions"
+    }
+   ]
+  },
+  {
+   "id": "cap-theorem-and-two-phase-commit",
+   "label": "The CAP theorem, two meanings of consistency and the two-phase commit",
+   "kind": "concept",
+   "category": "technical",
+   "priority": "core",
+   "estMin": 12,
+   "card": {
+    "definition": "The CAP theorem (Brewer's theorem) says a distributed database cannot guarantee consistency, availability and partition protection all at the same time. Keeping a primary and a backup consistent with a two-phase commit works, but every write waits for both servers.",
+    "keyFacts": [
+     {
+      "text": "A distributed database cannot guarantee consistency, availability and partition protection all at the same time.",
+      "ref": "L3#3",
+      "quote": "A distributed database cannot guarantee all three of these at the same time"
+     },
+     {
+      "text": "The CAP theorem is also called Brewer's theorem.",
+      "ref": "L3#3",
+      "quote": "The CAP Theorem (Brewer's Theorem)"
+     },
+     {
+      "text": "Consistency: all servers hold the same, current data.",
+      "ref": "L3#3",
+      "quote": "All servers hold the same, current data."
+     },
+     {
+      "text": "Availability: every query gets a response.",
+      "ref": "L3#3",
+      "quote": "Every query gets a response."
+     },
+     {
+      "text": "Partition protection: the system works even if the network splits servers apart.",
+      "ref": "L3#3",
+      "quote": "Works even if the network splits servers apart."
+     },
+     {
+      "text": "Transaction consistency: a change leaves the data in a valid state.",
+      "ref": "L3#4",
+      "quote": "Transaction consistency, a change leaves the data in a valid state."
+     },
+     {
+      "text": "Replica consistency: copies of data on different servers hold the same values.",
+      "ref": "L3#4",
+      "quote": "Replica consistency, copies of data on different servers hold the same values."
+     },
+     {
+      "text": "Two-phase commit: commit to the primary server, then to the backup server; the transaction commits only when both succeed.",
+      "ref": "L3#5",
+      "quote": "keep a primary and a backup, and write to both"
+     },
+     {
+      "text": "If either write fails, the whole transaction rolls back, so the two servers stay consistent.",
+      "ref": "L3#5",
+      "quote": "If either write fails, the whole transaction rolls back"
+     },
+     {
+      "text": "The price of the two-phase commit: a write is not finished until both servers confirm.",
+      "ref": "L3#5",
+      "quote": "a write is not finished until both servers confirm"
+     },
+     {
+      "text": "CA assumes no partition (two-phase commit); CP blocks some queries; AP may return stale data (the cart).",
+      "ref": "L3#6",
+      "quote": "Available + partition-tolerant, may return stale data (the cart)."
+     },
+     {
+      "text": "Partitions are rare on local networks, so designers mostly trade consistency against availability.",
+      "ref": "L3#6",
+      "quote": "designers mostly trade consistency against availability"
+     }
+    ]
+   },
+   "refs": [
+    "L2#28",
+    "L2#29",
+    "L2#30",
+    "L2#31",
+    "L3#3",
+    "L3#4",
+    "L3#5",
+    "L3#6"
+   ],
+   "anchors": [
+    {
+     "ref": "L3#3",
+     "quote": "The CAP Theorem"
+    }
+   ]
+  },
+  {
+   "id": "read-write-quorums",
+   "label": "Quorums: read and write thresholds",
+   "kind": "concept",
+   "category": "technical",
+   "priority": "core",
+   "estMin": 12,
+   "card": {
+    "definition": "A quorum is the number of servers that must respond for a read or a write to count as complete. The read threshold trades response time against consistency; the write threshold trades response time against durability.",
+    "keyFacts": [
+     {
+      "text": "A quorum is the number of servers that must respond for a read or write to count as complete.",
+      "ref": "L3#9",
+      "quote": "the number of servers that must respond for a read or write to count as complete"
+     },
+     {
+      "text": "With a quorum, servers effectively vote on the answer.",
+      "ref": "L3#9",
+      "quote": "Servers effectively \"vote\" on the answer."
+     },
+     {
+      "text": "The read threshold trades response time against consistency.",
+      "ref": "L3#9",
+      "quote": "Read threshold → response vs. consistency"
+     },
+     {
+      "text": "With 5 replicas, a read threshold of 1 is fastest but may return stale data.",
+      "ref": "L3#9",
+      "quote": "threshold 1 is fastest but may return stale data"
+     },
+     {
+      "text": "With 5 replicas, a read threshold of 5 guarantees a consistent read but is slowest.",
+      "ref": "L3#9",
+      "quote": "threshold 5 guarantees a consistent read but is slowest"
+     },
+     {
+      "text": "A middle read threshold, for example 3 of 5, lets the servers agree by majority.",
+      "ref": "L3#9",
+      "quote": "A middle value (e.g., 3) lets servers agree by majority"
+     },
+     {
+      "text": "The write threshold trades response time against durability.",
+      "ref": "L3#9",
+      "quote": "Write threshold → response vs. durability"
+     },
+     {
+      "text": "A write threshold of 1 is fast but risky: lose that server and the data is gone.",
+      "ref": "L3#9",
+      "quote": "Threshold 1 is fast but risky, lose that server and the data is gone."
+     },
+     {
+      "text": "A write threshold of at least 2, with more replicas than the threshold, protects durability without slowing writes much.",
+      "ref": "L3#9",
+      "quote": "protects durability without slowing writes much"
+     },
+     {
+      "text": "Example: write to 3 replicas and wait for 2 acks; the third is written in the background.",
+      "ref": "L4#39",
+      "quote": "Success returned after 2 acks; the app moves on."
+     },
+     {
+      "text": "Example read: wait for 2 matching answers; replica 3 answers v1 (stale), two agree on v2, so v2 is returned.",
+      "ref": "L4#39",
+      "quote": "Two agree: return v2 to the application."
+     },
+     {
+      "text": "A higher read quorum gives fresher data, at the cost of higher latency.",
+      "ref": "L4#39",
+      "quote": "A higher read quorum gives fresher data, at the cost of higher latency."
+     }
+    ]
+   },
+   "refs": [
+    "L3#9",
+    "L4#39",
+    "L4#45"
+   ],
+   "anchors": [
+    {
+     "ref": "L3#9",
+     "quote": "Quorums: Tuning the Balance"
+    }
+   ]
+  },
+  {
+   "id": "eventual-consistency-and-base",
+   "label": "ACID versus BASE and the strengths of eventual consistency",
+   "kind": "concept",
+   "category": "technical",
+   "priority": "core",
+   "estMin": 14,
+   "card": {
+    "definition": "ACID is the relational model's strict transaction guarantee; BASE (Basically Available, Soft State, Eventually Consistent) is the looser NoSQL model in which copies may differ briefly and then converge. Eventual consistency comes in several strengths: causal, read-your-writes, session, monotonic read and monotonic write.",
+    "keyFacts": [
+     {
+      "text": "ACID belongs to the relational model: strong, strict guarantees on every transaction, correctness first.",
+      "ref": "L3#10",
+      "quote": "Strong, strict guarantees on every transaction, correctness first."
+     },
+     {
+      "text": "BASE is common to NoSQL: looser guarantees that favour availability and speed at scale.",
+      "ref": "L3#10",
+      "quote": "Looser guarantees that favor availability and speed at scale."
+     },
+     {
+      "text": "ACID stands for Atomicity, Consistency, Isolation, Durability.",
+      "ref": "L3#10",
+      "quote": "Atomicity · Consistency · Isolation · Durability"
+     },
+     {
+      "text": "BASE stands for Basically Available, Soft State, Eventually Consistent.",
+      "ref": "L3#10",
+      "quote": "Basically Available · Soft State · Eventually Consistent"
+     },
+     {
+      "text": "Basically available: a partial failure is tolerated and the rest of the system keeps serving.",
+      "ref": "L3#11",
+      "quote": "A partial failure is tolerated, the rest of the system keeps serving."
+     },
+     {
+      "text": "Soft state: a value may be overwritten by more recent data later on.",
+      "ref": "L3#11",
+      "quote": "a value may be overwritten by more recent data later on"
+     },
+     {
+      "text": "Eventually consistent: copies may differ briefly, then converge once replication catches up.",
+      "ref": "L3#11",
+      "quote": "Copies may differ briefly, then converge to the same value once replication catches up."
+     },
+     {
+      "text": "Causal consistency: all copies reflect the order in which updates happened.",
+      "ref": "L3#12",
+      "quote": "All copies reflect the order in which updates happened"
+     },
+     {
+      "text": "Read-your-writes: once you write a value, your own reads always return it.",
+      "ref": "L3#12",
+      "quote": "Once you write a value, your own reads always return it"
+     },
+     {
+      "text": "Session consistency: read-your-writes holds, but only within one session.",
+      "ref": "L3#12",
+      "quote": "Read-your-writes holds, but only within one session."
+     },
+     {
+      "text": "Monotonic read: once you have seen a value, you never see an earlier version of it.",
+      "ref": "L3#13",
+      "quote": "Once you have seen a value, you will never see an earlier version of it"
+     },
+     {
+      "text": "Monotonic write: your writes execute in the order you issued them, essential when operations don't commute.",
+      "ref": "L3#13",
+      "quote": "Your writes execute in the order you issued them, essential when operations don't commute."
+     },
+     {
+      "text": "Charlie's bill: discount then order gives $2,000; order then discount gives $1,890.",
+      "ref": "L3#13",
+      "quote": "$2,100 less 10% = $1,890"
+     }
+    ]
+   },
+   "refs": [
+    "L3#10",
+    "L3#11",
+    "L3#12",
+    "L3#13",
+    "L4#39"
+   ],
+   "anchors": [
+    {
+     "ref": "L3#10",
+     "quote": "Two Transaction Models: ACID vs. BASE"
+    }
+   ]
+  },
+  {
+   "id": "replication-design-scenarios",
+   "label": "Synthesis: choose replication and consistency for a scenario",
+   "kind": "scenario",
+   "category": "situational",
+   "priority": "core",
+   "estMin": 15,
+   "card": {
+    "definition": "Put every step together on real cases: a bank needs consistency and availability at all times, a shopping cart accepts a short window of inconsistency for speed, a ride-hailing app must split its choice during a network fault, and a live-score site is read-heavy.",
+    "keyFacts": [
+     {
+      "text": "Bank and financial systems need both consistency and availability at all times: a two-phase commit is worth the extra time.",
+      "ref": "L3#7",
+      "quote": "A two-phase commit is worth the extra time, a wrong balance is unacceptable."
+     },
+     {
+      "text": "An e-commerce cart writes to one server, confirms to the shopper and replicates to the others in the background.",
+      "ref": "L3#7",
+      "quote": "Write to one server, confirm to the shopper, and replicate to the others in the background"
+     },
+     {
+      "text": "Eventual consistency means accepting a short window of inconsistency in return for speed, trusting the copies to converge.",
+      "ref": "L3#7",
+      "quote": "accept a short window of inconsistency in return for speed, trusting the copies to converge"
+     },
+     {
+      "text": "Ride-hailing exercise: a network fault cuts the link between the two replicas for 90 seconds.",
+      "ref": "L3#8",
+      "quote": "A network fault cuts the link between them for 90 seconds."
+     },
+     {
+      "text": "In the ride-hailing exercise the surge-price display tolerates small staleness, but the payment step must never double-charge a rider.",
+      "ref": "L3#8",
+      "quote": "the surge-price display tolerates small staleness, but the payment / charge step must never double-charge a rider"
+     },
+     {
+      "text": "The live-score scenario has many reads and very few writes.",
+      "ref": "T3#25",
+      "quote": "many reads, very few writes"
+     },
+     {
+      "text": "In the masterless conflict scenario, two journalists send different values for the same key to two nodes at 21:47:03.",
+      "ref": "T3#30",
+      "quote": "At 21:47:03, journalist A sends match:1001:homeGoals = 2 to node 1"
+     }
+    ]
+   },
+   "refs": [
+    "L3#7",
+    "L3#8",
+    "L4#38",
+    "T3#25",
+    "T3#28",
+    "T3#30"
+   ],
+   "anchors": [
+    {
+     "ref": "L3#7",
+     "quote": "The Consistency vs. Speed Trade-off"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,512 @@
+{
+ "nodeId": "read-write-quorums",
+ "guide": {
+  "index": [
+   "What you need first",
+   "What a quorum is",
+   "The read threshold",
+   "The write threshold",
+   "Worked example: 3 replicas, wait for 2",
+   "When does a read see the latest write?",
+   "Traps",
+   "Recap"
+  ],
+  "sections": [
+   {
+    "id": "prereq",
+    "title": "What you need first",
+    "kind": "prereq",
+    "body": "- Step 1: a **replica** is one copy of the data; how many replicas to keep is the key parameter of replication.\n- Step 4: designers mostly trade **consistency against availability**, and the two-phase commit pays for consistency with speed.\n\nA quorum is the dial between those extremes.",
+    "refs": [
+     "L4#38",
+     "L3#6",
+     "L3#5"
+    ]
+   },
+   {
+    "id": "definition",
+    "title": "What a quorum is",
+    "kind": "definition",
+    "body": "A **quorum** is the number of servers that must respond for a read or write to count as complete. Servers effectively \"vote\" on the answer (L3#9).\n\nThe vocabulary recap says the same in other words: a quorum is the replicas that must confirm a write or agree on a read (L4#45).\n\nThere are **two** thresholds, set separately: one for reads and one for writes.",
+    "facts": [
+     {
+      "text": "A quorum is the number of servers that must respond for a read or write to count as complete.",
+      "ref": "L3#9",
+      "quote": "the number of servers that must respond for a read or write to count as complete"
+     },
+     {
+      "text": "Servers effectively vote on the answer.",
+      "ref": "L3#9",
+      "quote": "Servers effectively \"vote\" on the answer."
+     },
+     {
+      "text": "Quorum: the replicas that must confirm a write or agree on a read.",
+      "ref": "L4#45",
+      "quote": "Quorum: replicas that must confirm a write or agree on a read"
+     }
+    ],
+    "refs": [
+     "L3#9",
+     "L4#45"
+    ]
+   },
+   {
+    "id": "read-threshold",
+    "title": "The read threshold",
+    "kind": "technique",
+    "body": "The read threshold trades **response time against consistency**. With **5 replicas** (L3#9):\n\n- **Threshold 1**: fastest, but may return stale data.\n- **Threshold 5**: guarantees a consistent read, but is slowest.\n- **A middle value (e.g. 3)**: lets the servers agree by majority.\n\nThe lecture 4 example adds: a higher read quorum gives fresher data, at the cost of higher latency (L4#39).",
+    "facts": [
+     {
+      "text": "The read threshold trades response time against consistency.",
+      "ref": "L3#9",
+      "quote": "Read threshold → response vs. consistency"
+     },
+     {
+      "text": "With 5 replicas, a read threshold of 1 is fastest but may return stale data.",
+      "ref": "L3#9",
+      "quote": "threshold 1 is fastest but may return stale data"
+     },
+     {
+      "text": "With 5 replicas, a read threshold of 5 guarantees a consistent read but is slowest.",
+      "ref": "L3#9",
+      "quote": "threshold 5 guarantees a consistent read but is slowest"
+     },
+     {
+      "text": "A middle value such as 3 lets servers agree by majority.",
+      "ref": "L3#9",
+      "quote": "A middle value (e.g., 3) lets servers agree by majority"
+     },
+     {
+      "text": "A higher read quorum gives fresher data at the cost of higher latency.",
+      "ref": "L4#39",
+      "quote": "A higher read quorum gives fresher data, at the cost of higher latency."
+     }
+    ],
+    "refs": [
+     "L3#9",
+     "L4#39"
+    ]
+   },
+   {
+    "id": "write-threshold",
+    "title": "The write threshold",
+    "kind": "technique",
+    "body": "The write threshold trades **response time against durability** (L3#9):\n\n- **Threshold 1**: fast but risky. Lose that server and the data is gone.\n- **At least 2**, with more replicas than the threshold: protects durability without slowing writes much.",
+    "facts": [
+     {
+      "text": "The write threshold trades response time against durability.",
+      "ref": "L3#9",
+      "quote": "Write threshold → response vs. durability"
+     },
+     {
+      "text": "A write threshold of 1 is fast but risky: lose that server and the data is gone.",
+      "ref": "L3#9",
+      "quote": "Threshold 1 is fast but risky, lose that server and the data is gone."
+     },
+     {
+      "text": "A write threshold of at least 2, with more replicas than the threshold, protects durability without slowing writes much.",
+      "ref": "L3#9",
+      "quote": "Setting it to at least 2 (with more replicas than the threshold) protects durability without slowing writes much."
+     }
+    ],
+    "refs": [
+     "L3#9"
+    ]
+   },
+   {
+    "id": "example",
+    "title": "Worked example: 3 replicas, wait for 2",
+    "kind": "example",
+    "body": "From L4#39.\n\n**Write: 3 replicas, wait for 2.** Replica 1 is written (ack), replica 2 is written (ack), replica 3 is written in the background. Success is returned after 2 acks and the app moves on.\n\n**Read: wait for 2 matching answers.** Replica 1 answers v2, replica 2 answers v2, replica 3 answers v1 (stale). Two agree, so v2 is returned to the application.\n\nThere is **no two-phase commit**, so replicas may briefly disagree but converge eventually: this is eventual consistency (step 6).",
+    "facts": [
+     {
+      "text": "Write example: success is returned after 2 acks and the app moves on.",
+      "ref": "L4#39",
+      "quote": "Success returned after 2 acks; the app moves on."
+     },
+     {
+      "text": "In the write example, replica 3 is written in the background.",
+      "ref": "L4#39",
+      "quote": "Replica 3 written in background"
+     },
+     {
+      "text": "In the read example, replica 3 answers v1 (stale).",
+      "ref": "L4#39",
+      "quote": "Replica 3 answers v1 (stale)"
+     },
+     {
+      "text": "Two agree, so v2 is returned to the application.",
+      "ref": "L4#39",
+      "quote": "Two agree: return v2 to the application."
+     },
+     {
+      "text": "With no two-phase commit, replicas may briefly disagree but converge eventually.",
+      "ref": "L4#39",
+      "quote": "no two-phase commit, so replicas may briefly disagree but converge eventually"
+     }
+    ],
+    "refs": [
+     "L4#39"
+    ]
+   },
+   {
+    "id": "overlap",
+    "title": "When does a read see the latest write?",
+    "kind": "formula",
+    "provenance": "authored",
+    "body": "This rule is **not on the slides**; it is the standard way to reason about the course's examples.\n\nWith `N` replicas, a write quorum `W` and a read quorum `R`:\n\n`R + W > N`\n\nmeans every read quorum overlaps every write quorum, so at least one replica in each read holds the latest acknowledged write.\n\n- L4#39: `N = 3, W = 2, R = 2` gives `4 > 3`: the read reaches a fresh replica (as in the example, where two replicas answer v2).\n- `N = 3, W = 2, R = 1` gives `3`, not more than 3: a read may hit replica 3 alone and get v1.\n- L3#9: `N = 5` with `R = 5` overlaps any `W >= 1`, which is why threshold 5 guarantees a consistent read.",
+    "refs": [
+     "L4#39",
+     "L3#9"
+    ]
+   },
+   {
+    "id": "traps",
+    "title": "Traps",
+    "kind": "trap",
+    "body": "- Trap: the read dial is about **consistency** (stale data); the write dial is about **durability** (losing data). Do not swap them (L3#9).\n- Trap: the quorum is not the number of replicas. The number of replicas is how many copies exist (L4#38); the quorum is how many of them must answer.\n- Trap: the slide guarantees a consistent read only for threshold 5 of 5. Threshold 3 is described as servers agreeing **by majority** (L3#9).\n- Trap: `R + W > N` is our authored rule, not a course statement; quote the slides when you are asked what the course says.",
+    "refs": [
+     "L3#9",
+     "L4#38"
+    ]
+   },
+   {
+    "id": "recap",
+    "title": "Recap",
+    "kind": "recap",
+    "body": "- A quorum is how many servers must respond for a read or write to count.\n- Read threshold: response against consistency (1 fastest but may be stale, 5 of 5 consistent but slowest, 3 by majority).\n- Write threshold: response against durability (1 risky, at least 2 protects durability).\n- L4#39: write to 3, wait for 2; read 2 matching answers; no two-phase commit, so replicas converge eventually.",
+    "refs": [
+     "L3#9",
+     "L4#39"
+    ]
+   }
+  ],
+  "needs": [
+   {
+    "nodeId": "replication-and-replicas",
+    "why": "A quorum counts replicas."
+   },
+   {
+    "nodeId": "cap-theorem-and-two-phase-commit",
+    "why": "Quorums tune the consistency and speed trade-off that CAP and the two-phase commit set up."
+   }
+  ],
+  "related": [
+   {
+    "nodeId": "eventual-consistency-and-base",
+    "why": "Next step: what readers may see while replicas converge."
+   },
+   {
+    "nodeId": "masterless-replication-and-ring",
+    "why": "In a ring each key lives on three nodes, so a quorum over them makes sense."
+   }
+  ]
+ },
+ "slides": [
+  {
+   "id": "s1-what",
+   "title": "Servers vote",
+   "primitive": "text",
+   "ref": "L3#9",
+   "spec": {
+    "body": "A **quorum** is the number of servers that must respond for a read or write to count as complete. Servers effectively \"vote\" on the answer.\n\nTwo dials, set separately:\n\n- **Read threshold**: response against consistency.\n- **Write threshold**: response against durability. L3#9"
+   }
+  },
+  {
+   "id": "s2-sandbox",
+   "title": "Quorum sandbox: 5 replicas",
+   "primitive": "quorum",
+   "ref": "L3#9",
+   "provenance": "authored",
+   "spec": {
+    "replicas": 5,
+    "intro": "This is the slide's own set-up: 5 replicas. Set R = 1 and watch reads get fast but possibly stale; set R = 5 for a guaranteed consistent but slowest read; try R = 3, the majority value. Then set W = 1 and imagine losing that one server: the data is gone. W = 2 or more protects durability. Our extra rule to test: whenever R + W is greater than 5, every read overlaps the latest write."
+   }
+  },
+  {
+   "id": "s3-write",
+   "title": "Write: 3 replicas, wait for 2",
+   "primitive": "flow",
+   "ref": "L4#39",
+   "spec": {
+    "nodes": [
+     {
+      "id": "app",
+      "label": "Application",
+      "sub": "writes v2"
+     },
+     {
+      "id": "r1",
+      "label": "Replica 1",
+      "sub": "ack"
+     },
+     {
+      "id": "r2",
+      "label": "Replica 2",
+      "sub": "ack"
+     },
+     {
+      "id": "r3",
+      "label": "Replica 3",
+      "sub": "background"
+     }
+    ],
+    "steps": [
+     {
+      "title": "Send the write",
+      "body": "The write of v2 goes to the 3 replicas.",
+      "active": [
+       "app",
+       "r1",
+       "r2",
+       "r3"
+      ],
+      "arrows": [
+       [
+        "app",
+        "r1"
+       ],
+       [
+        "app",
+        "r2"
+       ],
+       [
+        "app",
+        "r3"
+       ]
+      ]
+     },
+     {
+      "title": "Two acks",
+      "body": "Replica 1 written: ack. Replica 2 written: ack. Success is returned after 2 acks and the app moves on.",
+      "active": [
+       "r1",
+       "r2",
+       "app"
+      ],
+      "arrows": [
+       [
+        "r1",
+        "app"
+       ],
+       [
+        "r2",
+        "app"
+       ]
+      ]
+     },
+     {
+      "title": "The third in the background",
+      "body": "Replica 3 is written in the background. Until it is, it still holds v1.",
+      "active": [
+       "r3"
+      ],
+      "arrows": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "s4-read",
+   "title": "Read: wait for 2 matching answers",
+   "primitive": "kvrepl",
+   "ref": "L4#39",
+   "provenance": "authored",
+   "spec": {
+    "intro": "The command syntax is invented for this demo. The answers are the L4#39 read example (3 replicas, wait for 2 matching answers); the last two commands are ours.",
+    "script": [
+     {
+      "cmd": "read k --quorum 2",
+      "out": "replica1: v2\nreplica2: v2\nreplica3: v1 (stale)\n2 matching -> return v2",
+      "explain": "Two agree, so v2 is returned to the application."
+     },
+     {
+      "cmd": "read k --quorum 1 --from replica3",
+      "out": "replica3: v1 (stale)\nreturn v1",
+      "explain": "With a read quorum of 1 the fastest answer wins, even if it is stale: R + W = 1 + 2 is not more than 3."
+     },
+     {
+      "cmd": "read k --quorum 3",
+      "out": "replica1: v2\nreplica2: v2\nreplica3: v1 (stale)\nlatest of 3 -> return v2",
+      "explain": "A higher read quorum gives fresher data, at the cost of higher latency: this read waited for the slowest replica."
+     },
+     {
+      "cmd": "status replica3 --later",
+      "out": "replica3: k = v2",
+      "explain": "No two-phase commit: the replicas briefly disagreed, then converged (the timing is illustrative)."
+     }
+    ],
+    "hint": "Start with: read k --quorum 2"
+   }
+  },
+  {
+   "id": "s5-dials",
+   "title": "The read dial and the write dial",
+   "primitive": "compare",
+   "ref": "L3#9",
+   "spec": {
+    "columns": [
+     "Read threshold",
+     "Write threshold"
+    ],
+    "rows": [
+     [
+      "Trades",
+      "Response vs. consistency",
+      "Response vs. durability"
+     ],
+     [
+      "Threshold 1",
+      "Fastest but may return stale data",
+      "Fast but risky: lose that server and the data is gone"
+     ],
+     [
+      "Higher",
+      "5 of 5 guarantees a consistent read but is slowest",
+      "At least 2 (with more replicas than the threshold) protects durability"
+     ],
+     [
+      "Middle value",
+      "3 of 5: servers agree by majority",
+      "Not discussed on the slide"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "s6-pick",
+   "title": "Pick the dial",
+   "primitive": "chooser",
+   "ref": "L3#9",
+   "provenance": "authored",
+   "spec": {
+    "intro": "Each case needs one setting from L3#9. The cases are ours.",
+    "choices": [
+     "Read threshold 1",
+     "Read threshold 5 of 5",
+     "Write threshold of at least 2"
+    ],
+    "cases": [
+     {
+      "scenario": "A page-view counter on a blog: a slightly old number is fine, speed matters.",
+      "answer": 0,
+      "why": "Threshold 1 is fastest; the possible staleness does not matter here."
+     },
+     {
+      "scenario": "An audit report that must read exactly the current value, however long it takes.",
+      "answer": 1,
+      "why": "Threshold 5 guarantees a consistent read but is slowest."
+     },
+     {
+      "scenario": "An order must survive if one server dies right after the write is confirmed.",
+      "answer": 2,
+      "why": "Threshold 1 loses the data with that server; at least 2 protects durability without slowing writes much."
+     },
+     {
+      "scenario": "A product catalogue shown to millions of visitors, where an old price for a second is acceptable.",
+      "answer": 0,
+      "why": "Speed first: the read may be stale but returns fastest."
+     }
+    ]
+   }
+  },
+  {
+   "id": "s7-overlap",
+   "title": "Authored rule: R + W > N",
+   "primitive": "text",
+   "ref": "L4#39",
+   "provenance": "authored",
+   "spec": {
+    "body": "Not on the slides: if `R + W > N`, every read quorum shares at least one replica with every write quorum, so a read always reaches the latest acknowledged write.\n\n- `N = 3, W = 2, R = 2`: 4 > 3, fresh reads (the L4#39 example).\n- `N = 3, W = 2, R = 1`: 3 is not more than 3, a read may be stale.\n- `N = 5, R = 5`: overlaps any write, the slide's consistent read."
+   }
+  }
+ ],
+ "checkpoint": [
+  {
+   "id": "cp1",
+   "type": "mcq",
+   "prompt": "What is a quorum?",
+   "options": [
+    "The number of replicas the cluster keeps",
+    "The number of servers that must respond for a read or write to count as complete",
+    "The server that coordinates a two-phase commit",
+    "The fastest replica"
+   ],
+   "answer": 1,
+   "explanation": "A quorum counts responding servers; the number of copies kept is the replication parameter of step 1.",
+   "ref": "L3#9",
+   "quote": "the number of servers that must respond for a read or write to count as complete",
+   "trap": "Confusing the quorum with the number of replicas."
+  },
+  {
+   "id": "cp2",
+   "type": "fill",
+   "prompt": "With 5 replicas, a read threshold of ____ guarantees a consistent read but is slowest.",
+   "accepted": [
+    "5",
+    "five"
+   ],
+   "explanation": "Every replica must answer, so the read sees the current value; it waits for the slowest server.",
+   "ref": "L3#9",
+   "quote": "threshold 5 guarantees a consistent read but is slowest"
+  },
+  {
+   "id": "cp3",
+   "type": "multi",
+   "prompt": "In the L4#39 example (3 replicas, wait for 2), which statements are true?",
+   "options": [
+    "Success is returned after 2 acks and the app moves on",
+    "Replica 3 is written in the background",
+    "A two-phase commit makes all three replicas agree before success",
+    "On the read, two replicas agree on v2 and v2 is returned",
+    "The app waits for all three acks"
+   ],
+   "answers": [
+    0,
+    1,
+    3
+   ],
+   "explanation": "The example waits for 2 of 3 on both sides and explicitly has no two-phase commit, so replica 3 can briefly hold v1.",
+   "ref": "L4#39",
+   "quote": "Success returned after 2 acks; the app moves on."
+  },
+  {
+   "id": "cp4",
+   "type": "mcq",
+   "prompt": "What does the write threshold trade?",
+   "options": [
+    "Response time against consistency",
+    "Response time against durability",
+    "Storage against availability",
+    "Partitions against replicas"
+   ],
+   "answer": 1,
+   "explanation": "Write threshold: response against durability. The read threshold is the one that trades response against consistency.",
+   "ref": "L3#9",
+   "quote": "Write threshold → response vs. durability",
+   "trap": "Swapping the two dials."
+  },
+  {
+   "id": "cp5",
+   "type": "short",
+   "prompt": "Why set the write threshold to at least 2 rather than 1?",
+   "modelAnswer": "With a write threshold of 1 the write is fast but risky: only one server is sure to hold it, so if that server is lost the data is gone. Setting it to at least 2, with more replicas than the threshold, means the write is on two servers before success is returned, which protects durability without slowing writes much.",
+   "rubric": [
+    "Threshold 1: if that one server is lost, the data is gone",
+    "At least 2 means the write is on two servers before success",
+    "This protects durability",
+    "It does not slow writes much (with more replicas than the threshold)"
+   ],
+   "explanation": "L3#9: the write dial is about durability.",
+   "ref": "L3#9",
+   "quote": "Setting it to at least 2 (with more replicas than the threshold)"
+  }
+ ],
+ "audit": {
+  "by": "claude-opus-5-5 self-audit (the authoring model, in a separate refute pass; not an independent reviewer)",
+  "refuted": 0,
+  "fixed": 0,
+  "at": "2026-10-18T10:30:00Z",
+  "note": "Every fact, slide and answer was checked against L3#9, L4#39 and L4#45; nothing was refuted. The R + W > N rule is not in the course and is marked authored everywhere it appears."
+ }
+}
